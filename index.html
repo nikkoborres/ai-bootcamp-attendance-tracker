@@ -1,0 +1,2164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ministry Attendance Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f6f5f1;
+      --surface: #ffffff;
+      --surface2: #f0efe9;
+      --border: rgba(0,0,0,0.10);
+      --border-md: rgba(0,0,0,0.18);
+      --text: #1a1a18;
+      --text-2: #5f5e5a;
+      --text-3: #9e9d99;
+      --green: #1D9E75;
+      --green-bg: #E1F5EE;
+      --green-text: #0F6E56;
+      --amber-bg: #FAEEDA;
+      --amber-text: #854F0B;
+      --red-bg: #FCEBEB;
+      --red-text: #A32D2D;
+      --blue-bg: #E6F1FB;
+      --blue-text: #185FA5;
+      --radius: 10px;
+      --radius-lg: 14px;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    .topbar {
+      background: var(--surface); border-bottom: 0.5px solid var(--border);
+      padding: 0 1.5rem; display: flex; align-items: center; gap: 12px;
+      height: 58px; position: sticky; top: 0; z-index: 10;
+    }
+    .topbar-icon {
+      width: 32px; height: 32px; background: var(--green-bg); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; color: var(--green-text); font-size: 18px;
+    }
+    .topbar-title { font-size: 16px; font-weight: 600; color: var(--text); }
+    .topbar-sub { font-size: 13px; color: var(--text-2); margin-left: auto; }
+    .layout { display: flex; max-width: 960px; margin: 0 auto; min-height: calc(100vh - 58px); }
+    .sidebar {
+      width: 200px; flex-shrink: 0; padding: 1.5rem 1rem;
+      display: flex; flex-direction: column; gap: 4px;
+      border-right: 0.5px solid var(--border); background: var(--surface);
+    }
+    .nav-label {
+      font-size: 11px; font-weight: 600; color: var(--text-3);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 0 10px; margin: 12px 0 4px;
+    }
+    .nav-label:first-child { margin-top: 0; }
+    .nav-btn {
+      display: flex; align-items: center; gap: 10px; padding: 9px 10px;
+      border-radius: var(--radius); border: none; background: none; cursor: pointer;
+      color: var(--text-2); font-size: 14px; font-family: inherit; font-weight: 400;
+      transition: background 0.12s, color 0.12s; text-align: left; width: 100%;
+    }
+    .nav-btn i { font-size: 18px; flex-shrink: 0; }
+    .nav-btn:hover { background: var(--surface2); color: var(--text); }
+    .nav-btn.active { background: var(--green-bg); color: var(--green-text); font-weight: 500; }
+    .main { flex: 1; padding: 2rem; min-width: 0; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .page-title { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+    .page-sub { font-size: 14px; color: var(--text-2); margin-bottom: 1.5rem; }
+    input[type="text"], input[type="date"] {
+      height: 38px; border: 0.5px solid var(--border-md); border-radius: var(--radius);
+      padding: 0 12px; font-size: 14px; font-family: inherit;
+      background: var(--surface); color: var(--text); outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input[type="text"]:focus, input[type="date"]:focus {
+      border-color: var(--green); box-shadow: 0 0 0 3px rgba(29,158,117,0.12);
+    }
+    button {
+      height: 38px; padding: 0 16px; border-radius: var(--radius);
+      border: 0.5px solid var(--border-md); background: var(--surface); color: var(--text);
+      font-size: 14px; font-family: inherit; font-weight: 500; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px;
+      transition: background 0.12s, border-color 0.12s, transform 0.1s; white-space: nowrap;
+    }
+    button:hover { background: var(--surface2); }
+    button:active { transform: scale(0.98); }
+    button.primary { background: var(--green); color: #fff; border-color: var(--green); }
+    button.primary:hover { background: #178a65; }
+    .sec-label {
+      font-size: 11px; font-weight: 600; color: var(--text-3);
+      text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px;
+    }
+    .add-row { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+    .add-row input { flex: 1; }
+    .stat-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-bottom: 1.75rem; }
+    .stat-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; }
+    .stat-card .slabel { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
+    .stat-card .sval { font-size: 26px; font-weight: 600; }
+    .member-list { display: flex; flex-direction: column; gap: 8px; }
+    .member-card {
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 12px 16px;
+      display: flex; align-items: center; gap: 12px; transition: border-color 0.12s;
+    }
+    .member-card:hover { border-color: var(--border-md); }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--blue-bg); color: var(--blue-text);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; flex-shrink: 0;
+    }
+    .m-info { flex: 1; min-width: 0; }
+    .m-name { font-size: 15px; font-weight: 500; }
+    .m-stats { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+    .pct-badge { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+    .pct-high { background: var(--green-bg); color: var(--green-text); }
+    .pct-mid  { background: var(--amber-bg); color: var(--amber-text); }
+    .pct-low  { background: var(--red-bg);   color: var(--red-text); }
+    .icon-btn {
+      background: none; border: none; height: 30px; width: 30px; padding: 0;
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      color: var(--text-3); cursor: pointer; font-size: 17px;
+    }
+    .icon-btn:hover { background: var(--red-bg); color: var(--red-text); }
+    .icon-btn.edit-btn { color: var(--blue-text); }
+    .icon-btn.edit-btn:hover { background: var(--blue-bg); color: var(--blue-text); }
+    /* ── Inline member edit row ── */
+    .member-edit-row {
+      display: none; padding: 10px 14px; gap: 8px;
+      background: var(--surface2); border-top: 0.5px solid var(--border);
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      flex-wrap: wrap; align-items: center;
+    }
+    .member-edit-row.open { display: flex; }
+    .member-edit-row input[type="text"] { flex: 1; min-width: 140px; height: 34px; }
+    .member-edit-row select { height: 34px; font-size: 13px; }
+    .member-edit-row .btn-sm { height: 34px; }
+    .week-selector { display: flex; gap: 8px; align-items: center; margin-bottom: 1.5rem; }
+    .week-selector input { flex: 1; max-width: 220px; }
+    .attend-card {
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 1rem;
+    }
+    .attend-card-header {
+      padding: 12px 16px; border-bottom: 0.5px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .week-name { font-size: 15px; font-weight: 500; }
+    .attend-rows { padding: 4px 0; }
+    .attend-row {
+      display: flex; align-items: center; gap: 12px; padding: 10px 16px;
+      border-bottom: 0.5px solid var(--border); transition: background 0.1s;
+    }
+    .attend-row:last-child { border-bottom: none; }
+    .attend-row:hover { background: var(--surface2); }
+    input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--green); flex-shrink: 0; }
+    .a-name { flex: 1; font-size: 14px; cursor: pointer; }
+    .present-lbl { font-size: 12px; color: var(--green-text); font-weight: 500; min-width: 46px; text-align: right; }
+    .absent-lbl  { font-size: 12px; color: var(--text-3); min-width: 46px; text-align: right; }
+    .save-row { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+    .save-row .hint { font-size: 13px; color: var(--text-2); }
+    .history-list { display: flex; flex-direction: column; gap: 10px; }
+    .hist-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+    .hist-header {
+      padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; user-select: none; transition: background 0.1s;
+    }
+    .hist-header:hover { background: var(--surface2); }
+    .h-date { font-size: 15px; font-weight: 500; }
+    .h-summary { font-size: 13px; color: var(--text-2); margin-top: 2px; }
+    .h-right { display: flex; align-items: center; gap: 10px; }
+    .hist-body { padding: 6px 0; border-top: 0.5px solid var(--border); display: none; }
+    .hist-row { display: flex; align-items: center; gap: 10px; padding: 8px 16px; }
+    .hist-icon { font-size: 17px; }
+    .hist-icon.ok { color: var(--green-text); }
+    .hist-icon.no { color: var(--text-3); }
+    .hist-name { flex: 1; font-size: 14px; }
+    .bar-wrap { width: 80px; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 3px; background: var(--green); }
+    .empty { text-align: center; padding: 3rem 0; color: var(--text-3); }
+    .empty i { font-size: 36px; display: block; margin-bottom: 8px; }
+    .empty p { font-size: 14px; }
+    .group-heading {
+      font-size: 11px; font-weight: 600; color: var(--text-3);
+      text-transform: uppercase; letter-spacing: 0.07em;
+      padding: 4px 0 6px; margin-top: 12px; border-bottom: 0.5px solid var(--border);
+      margin-bottom: 6px;
+    }
+    .group-heading:first-child { margin-top: 0; }
+    .group-section { margin-bottom: 10px; }
+    .group-tag {
+      font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px;
+      background: var(--surface2); color: var(--text-2); margin-left: 6px;
+      vertical-align: middle; white-space: nowrap;
+    }
+    select {
+      height: 38px; border: 0.5px solid var(--border-md); border-radius: var(--radius);
+      padding: 0 10px; font-size: 14px; font-family: inherit;
+      background: var(--surface); color: var(--text); outline: none; cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(29,158,117,0.12); }
+    .attend-group-heading {
+      font-size: 11px; font-weight: 600; color: var(--text-2);
+      text-transform: uppercase; letter-spacing: 0.07em;
+      padding: 10px 16px 6px; background: var(--surface2);
+      border-bottom: 0.5px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .group-manager {
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 1.5rem;
+    }
+    .group-manager-title {
+      font-size: 12px; font-weight: 600; color: var(--text-2);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px;
+    }
+    .group-add-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .group-add-row input { flex: 1; }
+    .group-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .group-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 20px;
+      background: var(--surface2); border: 0.5px solid var(--border);
+      font-size: 13px; color: var(--text);
+    }
+    .group-chip.protected { color: var(--text-2); font-style: italic; }
+    .chip-del {
+      background: none; border: none; padding: 0; height: auto; width: 16px;
+      cursor: pointer; color: var(--text-3); font-size: 14px; line-height: 1;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 50%; transition: color 0.1s, background 0.1s;
+    }
+    .chip-del:hover { color: var(--red-text); background: var(--red-bg); }
+    .chip-del:active { transform: none; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1a1a18; color: #fff; padding: 10px 20px;
+      border-radius: 20px; font-size: 14px; font-weight: 500;
+      opacity: 0; transition: opacity 0.2s, transform 0.2s; z-index: 100; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    /* ── Groups tab ── */
+    .group-cards { display: flex; flex-direction: column; gap: 14px; }
+    .gcard {
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .gcard-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; border-bottom: 0.5px solid var(--border);
+      background: var(--surface2);
+    }
+    .gcard-title { font-size: 15px; font-weight: 600; flex: 1; }
+    .gcard-count { font-size: 12px; color: var(--text-2); }
+    .gcard-body { padding: 12px 16px; }
+    .gcard-members { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; min-height: 24px; }
+    .gmember-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 20px; font-size: 13px;
+      background: var(--blue-bg); color: var(--blue-text);
+    }
+    .gcard-assign { border-top: 0.5px solid var(--border); padding-top: 12px; margin-top: 4px; }
+    .gcard-assign-title { font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing:.06em; margin-bottom: 8px; }
+    .assign-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+    .assign-row { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+    .assign-row input[type="checkbox"] { flex-shrink: 0; }
+    .edit-input { flex: 1; height: 32px; font-size: 14px; padding: 0 10px; }
+    .gcard-edit-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .btn-sm { height: 30px; padding: 0 12px; font-size: 13px; }
+    .btn-danger { color: var(--red-text); border-color: transparent; background: none; }
+    .btn-danger:hover { background: var(--red-bg); }
+    .unassigned-card .gcard-header { background: var(--amber-bg); }
+    .unassigned-card .gcard-title { color: var(--amber-text); }
+    @media (max-width: 640px) {
+      .sidebar { width: 56px; padding: 1rem 6px; }
+      .nav-btn span { display: none; }
+      .nav-label { display: none; }
+      .nav-btn { justify-content: center; padding: 10px; }
+      .main { padding: 1.25rem 1rem; }
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+      .topbar-sub { display: none; }
+    }
+    /* ── History collapsible sections ── */
+    .hist-section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 4px; cursor: pointer; user-select: none;
+      border-bottom: 0.5px solid var(--border); margin-bottom: 10px;
+    }
+    .hist-section-header:hover { opacity: 0.75; }
+    .hist-section-chevron { font-size: 11px; color: var(--text-3); }
+    /* Compact week row */
+    .week-compact-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 14px; background: var(--surface);
+      border: 0.5px solid var(--border); border-radius: var(--radius);
+      margin-bottom: 6px; cursor: pointer; transition: background 0.1s;
+    }
+    .week-compact-row:hover { background: var(--surface2); }
+    .week-compact-date { font-size: 14px; font-weight: 500; flex: 1; }
+    .week-compact-count { font-size: 13px; color: var(--text-2); white-space: nowrap; }
+    .week-compact-detail { padding: 0 14px 10px; display: none; }
+    /* ── Bulk add panel ── */
+    .bulk-panel {
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 1.25rem;
+      display: none;
+    }
+    .bulk-panel.open { display: block; }
+    .bulk-panel textarea {
+      width: 100%; min-height: 100px; resize: vertical;
+      border: 0.5px solid var(--border-md); border-radius: var(--radius);
+      padding: 10px 12px; font-size: 14px; font-family: inherit;
+      color: var(--text); background: var(--bg); outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s; margin-bottom: 10px;
+    }
+    .bulk-panel textarea:focus {
+      border-color: var(--green); box-shadow: 0 0 0 3px rgba(29,158,117,0.12);
+    }
+    .bulk-panel-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    /* ── Collapsible attendance groups ── */
+    .attend-group-body { }
+    .attend-group-body.collapsed { display: none; }
+    .attend-group-chevron { font-size: 11px; color: var(--text-3); margin-right: 4px; min-width: 12px; display:inline-block; }
+    .attend-group-count { font-size: 12px; color: var(--text-2); margin-left: 6px; font-weight: 400; }
+    /* ── Group expanded member rows ── */
+    .group-member-row {
+      display: flex; align-items: center; gap: 8px;
+      min-width: 0; /* allow children to shrink */
+    }
+    .group-member-name {
+      display: flex; align-items: center; gap: 5px;
+      flex: 1; min-width: 0; /* shrink and truncate */
+      font-size: 13px; color: var(--text);
+      overflow: hidden;
+    }
+    .group-member-name span {
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .group-member-controls {
+      display: flex; align-items: center; gap: 6px;
+      flex-shrink: 0; /* never shrink — stays on right */
+    }
+    @media (max-width: 520px) {
+      .group-member-row { flex-wrap: wrap; }
+      .group-member-name { width: 100%; flex: unset; }
+      .group-member-controls { width: 100%; }
+    }
+    /* ── Settings page ── */
+    .settings-card {
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 20px 20px; max-width: 480px;
+    }
+    .settings-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .settings-field label { font-size: 13px; font-weight: 500; color: var(--text-2); }
+    .settings-field input[type="date"] { max-width: 220px; }
+    .settings-hint { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+    /* ── Attendance validation message ── */
+    .attend-validation {
+      background: var(--amber-bg); color: var(--amber-text);
+      border: 0.5px solid var(--amber-text); border-radius: var(--radius);
+      padding: 10px 14px; font-size: 14px; margin-bottom: 12px; display: none;
+    }
+    .attend-validation.visible { display: block; }
+    /* ── Auth overlays ── */
+    .auth-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: var(--bg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 2rem 1rem; overflow-y: auto;
+    }
+    .auth-overlay.hidden { display: none; }
+    .auth-brand { text-align: center; margin-bottom: 2.5rem; }
+    .auth-brand-icon {
+      width: 54px; height: 54px; border-radius: 14px;
+      background: var(--green-bg); color: var(--green-text);
+      font-size: 28px; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px;
+    }
+    .auth-brand h1 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+    .auth-brand p  { font-size: 14px; color: var(--text-2); max-width: 380px; }
+    .feature-cards {
+      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+      max-width: 560px; margin-bottom: 2.5rem;
+    }
+    .feature-card {
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 16px 18px;
+      flex: 1; min-width: 150px; max-width: 170px;
+    }
+    .feature-card i  { font-size: 22px; color: var(--green-text); margin-bottom: 8px; display: block; }
+    .feature-card h3 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .feature-card p  { font-size: 12px; color: var(--text-2); line-height: 1.4; }
+    .auth-footer { font-size: 12px; color: var(--text-3); margin-top: 1.5rem; }
+    /* Sign-in card */
+    .signin-card {
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 32px 32px;
+      width: 100%; max-width: 380px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    }
+    .signin-icon-badge {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--green-bg); color: var(--green-text);
+      font-size: 22px; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .signin-card h2      { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+    .signin-sub          { font-size: 13px; color: var(--text-2); margin-bottom: 24px; }
+    .signin-field        { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .signin-field label  { font-size: 13px; font-weight: 500; color: var(--text-2); }
+    .signin-field input  { height: 40px; }
+    .password-wrap       { position: relative; display: flex; align-items: center; }
+    .password-wrap input { width: 100%; padding-right: 42px; }
+    .pw-toggle {
+      position: absolute; right: 0; top: 0; bottom: 0; width: 40px;
+      background: none; border: none; color: var(--text-3); cursor: pointer;
+      font-size: 16px; display: flex; align-items: center; justify-content: center;
+      border-radius: 0 var(--radius) var(--radius) 0; transition: color 0.12s;
+    }
+    .pw-toggle:hover { color: var(--text); background: none; transform: none; }
+    .signin-error {
+      font-size: 13px; color: var(--red-text); background: var(--red-bg);
+      border-radius: var(--radius); padding: 8px 12px; margin-bottom: 14px; display: none;
+    }
+    .signin-error.visible { display: block; }
+    .signin-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+    /* Logout button in topbar */
+    .topbar-logout {
+      margin-left: auto; height: 30px; padding: 0 12px; font-size: 12px;
+      border-radius: 20px; border: 0.5px solid var(--border-md);
+      background: none; color: var(--text-2); cursor: pointer; font-family: inherit;
+      display: none; align-items: center; gap: 5px; transition: background 0.12s;
+    }
+    .topbar-logout:hover { background: var(--surface2); }
+    .topbar-logout.visible { display: flex; }
+  </style>
+</head>
+<body>
+
+<!-- ── Welcome Page ── -->
+<div class="auth-overlay" id="overlay-welcome">
+  <div class="auth-brand">
+    <div class="auth-brand-icon"><i class="ti ti-calendar-check"></i></div>
+    <h1>AI Bootcamp Attendance Tracker</h1>
+    <p>A secure attendance management tool for authorized leaders and facilitators.</p>
+  </div>
+  <div class="feature-cards">
+    <div class="feature-card">
+      <i class="ti ti-users"></i>
+      <h3>Manage Participants</h3>
+      <p>Organize names and group assignments.</p>
+    </div>
+    <div class="feature-card">
+      <i class="ti ti-checkbox"></i>
+      <h3>Record Attendance</h3>
+      <p>Track attendance by date and group.</p>
+    </div>
+    <div class="feature-card">
+      <i class="ti ti-chart-bar"></i>
+      <h3>Review History</h3>
+      <p>Monitor participation across sessions.</p>
+    </div>
+  </div>
+  <button class="primary" style="height:44px;padding:0 32px;font-size:15px" onclick="showSignIn()">
+    <i class="ti ti-lock"></i> Leader Sign In
+  </button>
+  <p class="auth-footer">Authorized access only.</p>
+</div>
+
+<!-- ── Sign In card ── -->
+<div class="auth-overlay hidden" id="overlay-signin">
+  <div class="signin-card">
+    <div class="signin-icon-badge"><i class="ti ti-lock"></i></div>
+    <h2>Leader Sign In</h2>
+    <p class="signin-sub">Enter your credentials to access the dashboard.</p>
+    <div class="signin-field">
+      <label for="signin-email">Email address</label>
+      <input type="email" id="signin-email" placeholder="your@email.com" autocomplete="email"
+        onkeydown="if(event.key==='Enter')handleSignIn()" />
+    </div>
+    <div class="signin-field">
+      <label for="signin-password">Password</label>
+      <div class="password-wrap">
+        <input type="password" id="signin-password" placeholder="Your password"
+          autocomplete="current-password" onkeydown="if(event.key==='Enter')handleSignIn()" />
+        <button class="pw-toggle" type="button" onclick="togglePwVisibility()" title="Show / hide password">
+          <i class="ti ti-eye" id="pw-toggle-icon"></i>
+        </button>
+      </div>
+    </div>
+    <div class="signin-error" id="signin-error"></div>
+    <div class="signin-actions">
+      <button class="primary" style="height:42px;font-size:15px" onclick="handleSignIn()">
+        <i class="ti ti-login"></i> Sign In
+      </button>
+      <button onclick="showWelcome()" style="color:var(--text-2)">
+        <i class="ti ti-arrow-left"></i> Back to Welcome
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="topbar-icon"><i class="ti ti-calendar-check"></i></div>
+  <span class="topbar-title">AI Bootcamp Attendance Tracker</span>
+  <span class="topbar-sub" id="topbar-date"></span>
+  <button class="topbar-logout" id="logout-btn" onclick="handleLogout()">
+    <i class="ti ti-logout"></i> Sign out
+  </button>
+</div>
+
+<div class="layout">
+  <nav class="sidebar">
+    <span class="nav-label">Menu</span>
+    <button class="nav-btn active" id="nav-members" onclick="switchPage('members')">
+      <i class="ti ti-users"></i><span>Members</span>
+    </button>
+    <button class="nav-btn" id="nav-groups" onclick="switchPage('groups')">
+      <i class="ti ti-folders"></i><span>Groups</span>
+    </button>
+    <button class="nav-btn" id="nav-attendance" onclick="switchPage('attendance')">
+      <i class="ti ti-checkbox"></i><span>Attendance</span>
+    </button>
+    <button class="nav-btn" id="nav-history" onclick="switchPage('history')">
+      <i class="ti ti-history"></i><span>History</span>
+    </button>
+    <button class="nav-btn" id="nav-settings" onclick="switchPage('settings')">
+      <i class="ti ti-settings"></i><span>Settings</span>
+    </button>
+  </nav>
+
+  <main class="main">
+
+    <!-- MEMBERS PAGE -->
+    <div class="page active" id="page-members">
+      <div class="page-title">Members</div>
+      <div class="page-sub">Add members and view the full roster. Only new members are created here.</div>
+
+      <div class="sec-label">Add new member</div>
+      <div class="add-row">
+        <input type="text" id="member-input" placeholder="Full name" onkeydown="if(event.key==='Enter')addMember()" />
+        <select id="member-group"></select>
+        <button class="primary" onclick="addMember()"><i class="ti ti-user-plus"></i> Add member</button>
+        <button onclick="toggleBulkPanel()" id="bulk-toggle-btn" title="Add multiple members at once"><i class="ti ti-list"></i> Bulk add</button>
+      </div>
+
+      <!-- Bulk add panel (hidden by default) -->
+      <div class="bulk-panel" id="bulk-panel">
+        <div class="sec-label" style="margin-bottom:8px">Bulk add members</div>
+        <textarea id="bulk-textarea" placeholder="Paste one member name per line:&#10;Juan dela Cruz&#10;Maria Santos&#10;Jose Reyes"></textarea>
+        <div class="bulk-panel-row">
+          <span style="font-size:13px;color:var(--text-2)">Group:</span>
+          <select id="bulk-group"></select>
+          <button class="primary" onclick="bulkAddMembers()"><i class="ti ti-users-plus"></i> Add members</button>
+          <button onclick="toggleBulkPanel()">Cancel</button>
+        </div>
+      </div>
+
+      <div class="sec-label">Roster (<span id="member-count">0</span>)</div>
+      <div class="member-list" id="member-list"></div>
+    </div>
+
+    <!-- GROUPS PAGE -->
+    <div class="page" id="page-groups">
+      <div class="page-title">Groups</div>
+      <div class="page-sub">Create groups, assign ungrouped members, and manage group names.</div>
+      <div class="sec-label">Add new group</div>
+      <div class="add-row" style="margin-bottom:1.75rem">
+        <input type="text" id="group-input" placeholder="Group name (e.g. Choir)" onkeydown="if(event.key==='Enter')addGroup()" />
+        <button class="primary" onclick="addGroup()"><i class="ti ti-folder-plus"></i> Add group</button>
+      </div>
+      <div class="sec-label">All groups</div>
+      <div class="group-cards" id="group-cards"></div>
+    </div>
+
+    <!-- ATTENDANCE PAGE -->
+    <div class="page" id="page-attendance">
+      <div class="page-title">Mark Attendance</div>
+      <div class="page-sub">Select a date — attendance loads automatically.</div>
+      <div class="sec-label">Attendance Date</div>
+      <div class="week-selector">
+        <input type="date" id="week-date" onchange="loadWeek()" />
+      </div>
+      <div class="attend-validation" id="attend-validation"></div>
+      <div id="attendance-body"></div>
+    </div>
+
+    <!-- HISTORY PAGE -->
+    <div class="page" id="page-history">
+      <div class="page-title">History</div>
+      <div class="page-sub">Review past attendance and percentages.</div>
+      <div class="stat-grid" id="summary-cards"></div>
+
+      <!-- Member Attendance section (collapsible, default expanded) -->
+      <div class="hist-section-header" onclick="toggleHistSection('pct-section', this)">
+        <span class="sec-label" style="margin:0">Member Attendance</span>
+        <span class="hist-section-chevron" id="pct-section-chev">▲</span>
+      </div>
+      <div id="pct-section">
+        <div class="member-list" id="pct-list" style="margin-bottom:1.75rem"></div>
+      </div>
+
+      <!-- By Date section (collapsible, default collapsed) -->
+      <div class="hist-section-header" onclick="toggleHistSection('week-section', this)" style="margin-top:4px">
+        <span class="sec-label" style="margin:0">By Date</span>
+        <span class="hist-section-chevron" id="week-section-chev">▼</span>
+      </div>
+      <div id="week-section" style="display:none">
+        <div class="history-list" id="history-list"></div>
+        <div id="show-more-row" style="text-align:center;margin-top:10px;display:none">
+          <button class="btn-sm" id="show-more-btn" onclick="toggleShowMore()">Show more</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS PAGE -->
+    <div class="page" id="page-settings">
+      <div class="page-title">Settings</div>
+      <div class="page-sub">Configure tracker preferences.</div>
+      <div class="settings-card">
+        <div class="settings-field">
+          <label for="settings-start-date">Tracker Start Date</label>
+          <input type="date" id="settings-start-date" />
+          <span class="settings-hint">Attendance cannot be recorded before this date. Dates before today are allowed.</span>
+        </div>
+        <button class="primary" onclick="saveSettings()"><i class="ti ti-device-floppy"></i> Save Settings</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ── State ── */
+  var DEFAULT_GROUPS = ['Unassigned']; /* used only as final UI fallback — Supabase is source of truth after login */
+  var state = { members: [], records: {}, groups: ['Unassigned'] };
+  var currentDate = '';
+  var trackerStartDate = ''; /* loaded from Supabase app_settings after login */
+
+  /* members: [{ name: string, group: string }]
+     groups:  [string, ...]  — user-managed; 'Unassigned' is always present
+     records: { 'YYYY-MM-DD': { memberName: true/false } } — never touched here */
+
+  function saveState() {
+    try { localStorage.setItem('mat_v1', JSON.stringify(state)); } catch(e) {}
+  }
+
+  async function loadTrackerStartDate() {
+    /* Always try Supabase first (called after auth). Fall back to localStorage, then derive. */
+    try {
+      var fromSupabase = await supabaseSettingsLoad('tracker_start_date');
+      if (fromSupabase && isValidISODate(fromSupabase)) {
+        trackerStartDate = fromSupabase;
+        try { localStorage.setItem('mat_start_date', trackerStartDate); } catch(e) {}
+        console.log('[Settings] trackerStartDate from Supabase:', trackerStartDate);
+        return;
+      }
+    } catch(e) { console.warn('[Settings] Supabase settings load failed:', e.message); }
+    /* Supabase unavailable — try localStorage */
+    try {
+      var saved = localStorage.getItem('mat_start_date');
+      if (saved && isValidISODate(saved)) { trackerStartDate = saved; return; }
+      localStorage.removeItem('mat_start_date');
+    } catch(e) {}
+    /* Last resort: derive from earliest valid record or today */
+    var today = todayISO();
+    var validDates = Object.keys(state.records)
+      .filter(function(d) { return isValidISODate(d) && d <= today; }).sort();
+    trackerStartDate = validDates.length ? validDates[0] : today;
+    try { localStorage.setItem('mat_start_date', trackerStartDate); } catch(e) {}
+    console.log('[Settings] trackerStartDate derived:', trackerStartDate);
+  }
+
+  /* Returns true only for valid YYYY-MM-DD strings with a plausible year (>= 2000) */
+  function isValidISODate(d) {
+    if (!d || typeof d !== 'string') return false;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return false;
+    var year = parseInt(d.slice(0, 4), 10);
+    if (year < 2000) return false;
+    var dt = new Date(d + 'T00:00:00');
+    return !isNaN(dt.getTime());
+  }
+
+  function saveSettings() {
+    var inp = document.getElementById('settings-start-date');
+    if (!inp || !inp.value) { toast('Please select a start date.'); return; }
+    if (!isValidISODate(inp.value)) { toast('Invalid date. Please use the date picker.'); return; }
+    trackerStartDate = inp.value;
+    try { localStorage.setItem('mat_start_date', trackerStartDate); } catch(e) {}
+    applyDateConstraints();
+    supabaseSettingsSave('tracker_start_date', trackerStartDate);
+    toast('Settings saved. Tracker start date: ' + trackerStartDate);
+  }
+
+  function renderSettings() {
+    var inp = document.getElementById('settings-start-date');
+    if (inp) inp.value = trackerStartDate || todayISO();
+  }
+
+  function applyDateConstraints() {
+    var dateInput = document.getElementById('week-date');
+    if (!dateInput) return;
+    dateInput.min = trackerStartDate || '';
+    dateInput.max = todayISO();
+  }
+
+  /* ── Attendance date validation ── */
+  function validateAttendanceDate(d) {
+    if (!d || !isValidISODate(d)) return 'Please select a valid attendance date.';
+    var today = todayISO();
+    if (d > today) return 'Future attendance dates are not allowed.';
+    if (trackerStartDate && d < trackerStartDate) return 'Attendance cannot be earlier than your tracker start date (' + trackerStartDate + ').';
+    return null; /* valid */
+  }
+
+  function showAttendanceValidation(msg) {
+    var el = document.getElementById('attend-validation');
+    var body = document.getElementById('attendance-body');
+    if (!el) return;
+    if (msg) {
+      el.textContent = '\u26A0\uFE0F ' + msg;
+      el.classList.add('visible');
+      if (body) body.innerHTML = ''; /* clear any previous attendance */
+    } else {
+      el.textContent = '';
+      el.classList.remove('visible');
+    }
+  }
+
+  function loadState() {
+    try {
+      var raw = localStorage.getItem('mat_v1');
+      if (!raw) return;
+      var parsed = JSON.parse(raw);
+      if (!parsed || !Array.isArray(parsed.members)) return;
+
+      /* 1. Migrate members: string → object */
+      parsed.members = parsed.members.map(function(m) {
+        if (typeof m === 'string') return { name: m, group: 'Unassigned' };
+        if (!m.group) m.group = 'Unassigned';
+        return m;
+      });
+
+      /* 2. Build/migrate groups list — do NOT inject hardcoded defaults */
+      if (Array.isArray(parsed.groups) && parsed.groups.length) {
+        /* Already has groups array — ensure Unassigned exists */
+        if (parsed.groups.indexOf('Unassigned') === -1) parsed.groups.push('Unassigned');
+      } else {
+        /* No groups saved — collect from member group labels only */
+        var seen = { 'Unassigned': true };
+        var groups = ['Unassigned'];
+        parsed.members.forEach(function(m) {
+          if (m.group && !seen[m.group]) { seen[m.group] = true; groups.push(m.group); }
+        });
+        parsed.groups = groups;
+      }
+
+      state = parsed;
+    } catch(e) {}
+  }
+
+  /* ── Helpers ── */
+  function initials(name) {
+    return name.trim().split(/\s+/).map(function(w){ return w[0] || ''; }).join('').toUpperCase().slice(0, 2) || '?';
+  }
+  function pctClass(p) { return p >= 75 ? 'pct-high' : p >= 50 ? 'pct-mid' : 'pct-low'; }
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  /* Returns only valid, in-range attendance dates */
+  function validAttendanceWeeks() {
+    var today = todayISO();
+    return Object.keys(state.records).filter(function(d) {
+      if (!isValidISODate(d)) return false;
+      if (d > today) return false;
+      if (trackerStartDate && d < trackerStartDate) return false;
+      return true;
+    }).sort();
+  }
+
+  function memberAttendance(name) {
+    var weeks = validAttendanceWeeks();
+    if (!weeks.length) return { attended: 0, total: 0, pct: 0 };
+    var attended = 0;
+    weeks.forEach(function(w) {
+      if (state.records[w] && state.records[w][name] === true) attended++;
+    });
+    return { attended: attended, total: weeks.length, pct: Math.round((attended / weeks.length) * 100) };
+  }
+  function fmtDate(d) {
+    return new Date(d + 'T00:00:00').toLocaleDateString('en-PH', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  }
+  function fmtShort(d) {
+    return new Date(d + 'T00:00:00').toLocaleDateString('en-PH', { weekday:'short', year:'numeric', month:'short', day:'numeric' });
+  }
+  var toastTimer = null;
+  function toast(msg) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() { el.classList.remove('show'); }, 2200);
+  }
+
+  /* Natural sort comparator — handles "group 2" < "group 11" correctly */
+  function natSort(a, b) {
+    return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+  }
+  function natSortKey(key) {
+    return function(a, b) { return natSort(a[key], b[key]); };
+  }
+
+  /* Group members — alphabetical within each group; Unassigned always last */
+  function alphaSortGroups(groupList) {
+    var unassigned = null;
+    var rest = groupList.filter(function(g) {
+      if (g.label === 'Unassigned') { unassigned = g; return false; }
+      return true;
+    });
+    rest.sort(function(a, b) { return natSort(a.label, b.label); });
+    if (unassigned) rest.push(unassigned);
+    return rest;
+  }
+  function groupedMembers() {
+    var buckets = {};
+    state.members.forEach(function(m) {
+      var g = m.group || 'Unassigned';
+      if (!buckets[g]) buckets[g] = [];
+      buckets[g].push(m);
+    });
+    /* Sort members within each bucket — natural sort */
+    Object.keys(buckets).forEach(function(g) {
+      buckets[g].sort(natSortKey('name'));
+    });
+    /* Build ordered list from state.groups — natural sort, Unassigned last */
+    var seen = {};
+    var sortedGroups = state.groups.slice().sort(function(a, b) {
+      if (a === 'Unassigned') return 1;
+      if (b === 'Unassigned') return -1;
+      return natSort(a, b);
+    });
+    var ordered = [];
+    sortedGroups.forEach(function(g) {
+      seen[g] = true;
+      if (buckets[g]) ordered.push({ label: g, members: buckets[g] });
+    });
+    Object.keys(buckets).forEach(function(g) {
+      if (!seen[g]) ordered.push({ label: g, members: buckets[g] });
+    });
+    return ordered;
+  }
+
+  /* ── Group management (Groups tab) ── */
+  function sortedGroupList() {
+    return state.groups.slice().sort(function(a,b){
+      if (a==='Unassigned') return 1; if (b==='Unassigned') return -1;
+      return natSort(a, b);
+    });
+  }
+
+  function renderGroups() {
+    renderGroupUI();
+
+    var container = document.getElementById('group-cards');
+    if (!container) return;
+
+    var sorted = sortedGroupList();
+
+    /* ── Ungrouped members section ── */
+    var ungrouped = state.members
+      .filter(function(m){ return m.group === 'Unassigned'; })
+      .sort(natSortKey('name'));
+
+    var ungroupedHtml = '';
+    if (ungrouped.length) {
+      var targetOptions = sorted
+        .filter(function(g){ return g !== 'Unassigned'; })
+        .map(function(g){ return '<option value="' + esc(g) + '">' + esc(g) + '</option>'; })
+        .join('');
+      if (!targetOptions) targetOptions = '<option value="">— No groups yet —</option>';
+
+      var checkboxRows = ungrouped.map(function(m, i){
+        return '<label class="assign-row">' +
+          '<input type="checkbox" class="ung-cb" value="' + esc(m.name) + '" /> ' +
+          esc(m.name) + '</label>';
+      }).join('');
+
+      ungroupedHtml =
+        '<div class="gcard unassigned-card" style="margin-bottom:14px">' +
+          '<div class="gcard-header">' +
+            '<div class="gcard-title">Ungrouped Members</div>' +
+            '<span class="gcard-count">' + ungrouped.length + ' member' + (ungrouped.length!==1?'s':'') + '</span>' +
+          '</div>' +
+          '<div class="gcard-body">' +
+            '<div class="assign-list">' + checkboxRows + '</div>' +
+            '<div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">' +
+              '<span style="font-size:13px;color:var(--text-2)">Move selected to:</span>' +
+              '<select id="ung-target" style="height:34px;font-size:13px">' + targetOptions + '</select>' +
+              '<button class="btn-sm primary" id="btn-move-ungrouped"><i class="ti ti-arrow-right"></i> Move to group</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    } else {
+      ungroupedHtml =
+        '<div style="font-size:13px;color:var(--text-3);margin-bottom:14px;padding:10px 0">' +
+          '<i class="ti ti-circle-check" style="color:var(--green-text);margin-right:6px"></i>All members are assigned to a group.' +
+        '</div>';
+    }
+
+    /* ── Group cards (collapsed by default) ── */
+    var groupHtml = sorted.filter(function(g){ return g !== 'Unassigned'; }).map(function(gName, idx) {
+      var membersInGroup = state.members
+        .filter(function(m){ return m.group === gName; })
+        .sort(natSortKey('name'));
+      var count = membersInGroup.length;
+      var cardId  = 'gcard-body-' + idx;
+      var editId  = 'gedit-row-'  + idx;
+      var inputId = 'gedit-inp-'  + idx;
+
+      /* Build move-to options: all groups except current one */
+      var moveOptions = sorted
+        .filter(function(g){ return g !== gName; })
+        .map(function(g){ return '<option value="' + esc(g) + '">' + esc(g === 'Unassigned' ? 'Ungrouped' : g) + '</option>'; })
+        .join('');
+
+      var memberList = count
+        ? '<div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">' +
+            membersInGroup.map(function(m, mi){
+              var selId = 'mv-sel-' + idx + '-' + mi;
+              return '<div class="group-member-row">' +
+                '<span class="group-member-name">' +
+                  '<div class="avatar" style="width:28px;height:28px;font-size:11px;flex-shrink:0">' + initials(m.name) + '</div>' +
+                  '<span>' + esc(m.name) + '</span>' +
+                '</span>' +
+                '<div class="group-member-controls">' +
+                  '<select id="' + selId + '" style="height:30px;font-size:12px;padding:0 6px">' + moveOptions + '</select>' +
+                  '<button class="btn-sm" style="height:30px;font-size:12px" ' +
+                    'data-action="move-from-group" data-mname="' + esc(m.name) + '" data-selid="' + selId + '">' +
+                    '<i class="ti ti-arrow-right"></i> Move' +
+                  '</button>' +
+                '</div>' +
+              '</div>';
+            }).join('') +
+          '</div>'
+        : '<p style="font-size:13px;color:var(--text-3);margin-top:8px">No members in this group yet.</p>';
+
+      var editRow =
+        '<div id="' + editId + '" style="display:none;gap:8px;margin-bottom:10px;align-items:center">' +
+          '<input id="' + inputId + '" type="text" class="edit-input" value="' + esc(gName) + '" />' +
+          '<button class="btn-sm primary" data-action="save-edit" data-card="' + idx + '" data-oldname="' + esc(gName) + '"><i class="ti ti-check"></i> Save</button>' +
+          '<button class="btn-sm" data-action="cancel-edit" data-editid="' + editId + '">Cancel</button>' +
+        '</div>';
+
+      return '<div class="gcard">' +
+        '<div class="gcard-header" style="cursor:pointer" data-action="toggle-card" data-cardid="' + cardId + '">' +
+          '<div class="gcard-title">' + esc(gName) + '</div>' +
+          '<span class="gcard-count" style="margin-right:auto">' + count + ' member' + (count!==1?'s':'') + '</span>' +
+          '<div style="display:flex;gap:6px">' +
+            '<button class="btn-sm" data-action="edit-group" data-editid="' + editId + '" data-cardid="' + cardId + '"><i class="ti ti-pencil"></i> Edit</button>' +
+            '<button class="btn-sm btn-danger" data-action="delete-group" data-name="' + esc(gName) + '"><i class="ti ti-trash"></i> Delete</button>' +
+          '</div>' +
+        '</div>' +
+        '<div id="' + cardId + '" style="display:none">' +
+          '<div class="gcard-body">' + editRow + memberList + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    container.innerHTML = ungroupedHtml + groupHtml;
+  }
+
+  /* DOM helpers */
+  function toggleEl(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+  function hideEl(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  }
+  function toggleEditInCard(editId, cardId) {
+    var card = document.getElementById(cardId);
+    if (card) card.style.display = 'block';
+    var edit = document.getElementById(editId);
+    if (edit) edit.style.display = edit.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function addGroup() {
+    var inp = document.getElementById('group-input');
+    var name = inp.value.trim();
+    if (!name) { toast('Please enter a group name.'); inp.focus(); return; }
+    var lower = name.toLowerCase();
+    var exists = state.groups.some(function(g){ return g.toLowerCase() === lower; });
+    if (exists) { toast('That group already exists.'); inp.focus(); return; }
+    state.groups.push(name);
+    saveState();
+    supabaseGroupAdd(name);
+    inp.value = '';
+    inp.focus();
+    renderGroups();
+    toast('Group "' + name + '" created.');
+  }
+
+  function deleteGroup(name) {
+    if (name === 'Unassigned') { toast('"Unassigned" cannot be deleted.'); return; }
+    var hasMembers = state.members.some(function(m){ return m.group === name; });
+    if (hasMembers) { toast('Move or remove all members in "' + name + '" first.'); return; }
+    if (!confirm('Delete group "' + name + '"?')) return;
+    state.groups = state.groups.filter(function(g){ return g !== name; });
+    saveState();
+    supabaseGroupDelete(name);
+    renderGroups();
+    renderMembers();
+    toast('Group "' + name + '" deleted.');
+  }
+
+  function confirmEditGroup(oldName, editId, inputId) {
+    var inp = document.getElementById(inputId);
+    if (!inp) return;
+    var newName = inp.value.trim();
+    if (!newName) { toast('Group name cannot be blank.'); return; }
+    if (newName === oldName) { hideEl(editId); return; }
+    var lower = newName.toLowerCase();
+    var conflict = state.groups.some(function(g){ return g !== oldName && g.toLowerCase() === lower; });
+    if (conflict) { toast('A group with that name already exists.'); return; }
+    state.groups = state.groups.map(function(g){ return g === oldName ? newName : g; });
+    state.members.forEach(function(m){ if (m.group === oldName) m.group = newName; });
+    saveState();
+    supabaseGroupRename(oldName, newName);
+    renderGroups();
+    renderMembers();
+    toast('Group renamed to "' + newName + '".');
+  }
+
+  function moveUngrouped() {
+    var sel = document.getElementById('ung-target');
+    if (!sel || !sel.value) { toast('Please select a target group.'); return; }
+    var target = sel.value;
+    var checkboxes = document.querySelectorAll('#group-cards input[type="checkbox"]:checked');
+    if (!checkboxes.length) { toast('Select at least one member to move.'); return; }
+    var moved = 0;
+    var movedNames = [];
+    checkboxes.forEach(function(cb) {
+      var mName = cb.value;
+      state.members.forEach(function(m) {
+        if (m.name === mName && m.group === 'Unassigned') { m.group = target; moved++; movedNames.push(mName); }
+      });
+    });
+    if (!moved) { toast('No members were moved.'); return; }
+    saveState();
+    movedNames.forEach(function(n) { supabaseMemberUpdateGroup(n, target); });
+    renderGroups();
+    renderMembers();
+    toast(moved + ' member' + (moved!==1?'s':'') + ' moved to "' + target + '".');
+  }
+
+  /* ── renderGroupUI (Members tab dropdowns only) ── */
+  function renderGroupUI() {
+    var sortedG = state.groups.slice().sort(function(a,b){
+      if (a==='Unassigned') return 1; if (b==='Unassigned') return -1;
+      return natSort(a, b);
+    });
+    var optionsHtml = sortedG.map(function(g){
+      return '<option value="' + esc(g) + '">' + esc(g) + '</option>';
+    }).join('');
+
+    /* Single add dropdown */
+    var sel = document.getElementById('member-group');
+    if (sel) {
+      var prev = sel.value;
+      sel.innerHTML = optionsHtml;
+      if (prev && state.groups.indexOf(prev) !== -1) sel.value = prev;
+    }
+
+    /* Bulk add dropdown */
+    var bulkSel = document.getElementById('bulk-group');
+    if (bulkSel) {
+      var bulkPrev = bulkSel.value;
+      bulkSel.innerHTML = optionsHtml;
+      if (bulkPrev && state.groups.indexOf(bulkPrev) !== -1) bulkSel.value = bulkPrev;
+    }
+  }
+
+  /* ── Event delegation — handles all dynamically rendered buttons ── */
+  function setupDelegation() {
+    /* Members list delegation */
+    document.getElementById('member-list').addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-action="remove-member"]');
+      if (btn) { removeMember(btn.getAttribute('data-name')); return; }
+
+      var editBtn = e.target.closest('[data-action="edit-member"]');
+      if (editBtn) {
+        var editId = editBtn.getAttribute('data-editid');
+        var row = document.getElementById(editId);
+        if (row) {
+          var isOpen = row.classList.contains('open');
+          /* Close all other open edit rows first */
+          document.querySelectorAll('.member-edit-row.open').forEach(function(r){ r.classList.remove('open'); });
+          if (!isOpen) { row.classList.add('open'); row.querySelector('.medit-name').focus(); }
+        }
+        return;
+      }
+
+      var saveBtn = e.target.closest('[data-action="save-member-edit"]');
+      if (saveBtn) { saveMemberEdit(saveBtn.getAttribute('data-editid')); return; }
+
+      var cancelBtn = e.target.closest('[data-action="cancel-member-edit"]');
+      if (cancelBtn) {
+        var row2 = document.getElementById(cancelBtn.getAttribute('data-editid'));
+        if (row2) row2.classList.remove('open');
+        return;
+      }
+    });
+
+    /* Group cards delegation */
+    document.getElementById('group-cards').addEventListener('click', function(e) {
+      /* Move ungrouped button */
+      if (e.target.closest('#btn-move-ungrouped')) {
+        moveUngrouped(); return;
+      }
+
+      var btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      var action = btn.getAttribute('data-action');
+
+      if (action === 'toggle-card') {
+        /* Only fire if click wasn't on a child button */
+        if (e.target.closest('button')) return;
+        toggleEl(btn.getAttribute('data-cardid'));
+        return;
+      }
+      if (action === 'edit-group') {
+        toggleEditInCard(btn.getAttribute('data-editid'), btn.getAttribute('data-cardid'));
+        return;
+      }
+      if (action === 'delete-group') {
+        deleteGroup(btn.getAttribute('data-name')); return;
+      }
+      if (action === 'save-edit') {
+        var idx = btn.getAttribute('data-card');
+        var oldName = btn.getAttribute('data-oldname');
+        confirmEditGroup(oldName, 'gedit-row-' + idx, 'gedit-inp-' + idx);
+        return;
+      }
+      if (action === 'cancel-edit') {
+        hideEl(btn.getAttribute('data-editid')); return;
+      }
+      if (action === 'move-from-group') {
+        var mName = btn.getAttribute('data-mname');
+        var selId  = btn.getAttribute('data-selid');
+        var sel2   = document.getElementById(selId);
+        if (!sel2 || !sel2.value) { toast('Please select a destination group.'); return; }
+        var dest = sel2.value;
+        var member = state.members.find(function(m){ return m.name === mName; });
+        if (member) { member.group = dest; }
+        saveState();
+        supabaseMemberUpdateGroup(mName, dest);
+        renderGroups();
+        renderMembers();
+        toast(mName + ' moved to "' + (dest === 'Unassigned' ? 'Ungrouped' : dest) + '".');
+        return;
+      }
+    });
+
+    /* Attendance body delegation — check-all-group + toggle-attend-group */
+    document.getElementById('attendance-body').addEventListener('click', function(e) {
+      /* Check all / Uncheck all — must be checked FIRST before toggle */
+      var btn = e.target.closest('[data-action="check-all-group"]');
+      if (btn) {
+        var indices = btn.getAttribute('data-indices').split(',').map(Number);
+        var present = btn.getAttribute('data-present') === 'true';
+        var groupId = btn.getAttribute('data-groupid');
+        checkAllGroup(indices, present, groupId);
+        return;
+      }
+      /* Toggle group collapse — only when click is NOT on a button */
+      var heading = e.target.closest('[data-action="toggle-attend-group"]');
+      if (heading && !e.target.closest('button')) {
+        toggleAttendGroup(heading.getAttribute('data-groupid'));
+        return;
+      }
+    });
+    document.getElementById('group-cards').addEventListener('keydown', function(e) {
+      if (e.key !== 'Enter') return;
+      var inp = e.target.closest('.edit-input');
+      if (!inp) return;
+      var idx = inp.id.replace('gedit-inp-', '');
+      var saveBtn = document.querySelector('[data-action="save-edit"][data-card="' + idx + '"]');
+      if (saveBtn) saveBtn.click();
+    });
+  }
+
+  function switchPage(page) {
+    ['members','groups','attendance','history','settings'].forEach(function(p) {
+      document.getElementById('page-' + p).classList.toggle('active', p === page);
+      document.getElementById('nav-' + p).classList.toggle('active', p === page);
+    });
+    if (page === 'history')    renderHistory();
+    if (page === 'members')    renderMembers();
+    if (page === 'groups')     renderGroups();
+    if (page === 'settings')   renderSettings();
+    if (page === 'attendance') {
+      applyDateConstraints();
+      var iso = todayISO();
+      var err = validateAttendanceDate(iso);
+      if (!err) {
+        document.getElementById('week-date').value = iso;
+        showAttendanceValidation(null);
+        if (!state.records[iso]) state.records[iso] = {};
+        currentDate = iso;
+        renderAttendance(iso);
+      } else {
+        document.getElementById('week-date').value = '';
+        showAttendanceValidation(err);
+      }
+    }
+  }
+
+  function todayISO() {
+    var now = new Date();
+    var y = now.getFullYear();
+    var mo = String(now.getMonth() + 1).padStart(2, '0');
+    var dd = String(now.getDate()).padStart(2, '0');
+    return y + '-' + mo + '-' + dd;
+  }
+
+  /* ── Members ── */
+  function renderMembers() {
+    renderGroupUI(); /* rebuild dropdown */
+    var list = document.getElementById('member-list');
+    document.getElementById('member-count').textContent = state.members.length;
+    if (!state.members.length) {
+      list.innerHTML = '<div class="empty"><i class="ti ti-users"></i><p>No members yet. Add someone above.</p></div>';
+      return;
+    }
+    /* Alpha-sorted grouped view */
+    var groups = groupedMembers();
+    var html = '';
+    groups.forEach(function(g) {
+      html += '<div class="group-section">';
+      html += '<div class="group-heading"><i class="ti ti-users-group" style="font-size:13px;vertical-align:-1px;margin-right:5px"></i>' + esc(g.label) + ' <span style="font-weight:400;color:var(--text-3)">(' + g.members.length + ')</span></div>';
+      g.members.forEach(function(m) {
+        var att = memberAttendance(m.name);
+        var stats = att.total ? (att.attended + ' of ' + att.total + ' attendance dates') : 'No records yet';
+        var badge = att.total ? ('<span class="pct-badge ' + pctClass(att.pct) + '">' + att.pct + '%</span>') : '';
+        var safeName = esc(m.name);
+        /* Stable edit row ID — index-based to avoid special char issues */
+        var memberIdx = state.members.indexOf(m);
+        var editRowId = 'medit-' + memberIdx;
+
+        /* Group options using natSort (defined at line 663) */
+        var groupOpts = state.groups.slice().sort(function(a,b){
+          if (a==='Unassigned') return 1; if (b==='Unassigned') return -1;
+          return natSort(a, b);
+        }).map(function(g2){
+          return '<option value="' + esc(g2) + '"' + (g2 === m.group ? ' selected' : '') + '>' + esc(g2) + '</option>';
+        }).join('');
+
+        html += '<div class="member-card" style="flex-direction:column;align-items:stretch;padding:0;overflow:hidden">' +
+          /* main display row */
+          '<div style="display:flex;align-items:center;gap:12px;padding:12px 16px">' +
+            '<div class="avatar">' + initials(m.name) + '</div>' +
+            '<div class="m-info" style="min-width:0;overflow:hidden">' +
+              '<div class="m-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + safeName + '</div>' +
+              '<div class="m-stats">' + stats + '</div>' +
+            '</div>' +
+            badge +
+            '<button class="icon-btn edit-btn" title="Edit member" data-action="edit-member" data-editid="' + editRowId + '"><i class="ti ti-pencil"></i></button>' +
+            '<button class="icon-btn" title="Remove member" data-action="remove-member" data-name="' + safeName + '"><i class="ti ti-trash"></i></button>' +
+          '</div>' +
+          /* inline edit row — hidden until pencil clicked */
+          '<div class="member-edit-row" id="' + editRowId + '" data-origname="' + safeName + '">' +
+            '<input type="text" class="medit-name" value="' + safeName + '" placeholder="Member name" />' +
+            '<select class="medit-group">' + groupOpts + '</select>' +
+            '<button class="btn-sm primary" data-action="save-member-edit" data-editid="' + editRowId + '"><i class="ti ti-check"></i> Save</button>' +
+            '<button class="btn-sm" data-action="cancel-member-edit" data-editid="' + editRowId + '">Cancel</button>' +
+          '</div>' +
+        '</div>';
+      });
+      html += '</div>';
+    });
+    list.innerHTML = html;
+  }
+
+  function addMember() {
+    var inp = document.getElementById('member-input');
+    var sel = document.getElementById('member-group');
+    var name = inp.value.trim();
+    var group = sel ? sel.value : 'Unassigned';
+    if (!name) { toast('Please enter a name.'); inp.focus(); return; }
+    var exists = state.members.some(function(m) { return m.name === name; });
+    if (exists) { toast('That member already exists.'); inp.focus(); return; }
+    state.members.push({ name: name, group: group });
+    saveState();
+    supabaseMemberAdd(name, group);
+    inp.value = '';
+    inp.focus();
+    renderMembers();
+    toast('Member "' + name + '" added to ' + group + '.');
+  }
+
+  function toggleBulkPanel() {
+    var panel = document.getElementById('bulk-panel');
+    var btn   = document.getElementById('bulk-toggle-btn');
+    if (!panel) return;
+    var isOpen = panel.classList.contains('open');
+    panel.classList.toggle('open', !isOpen);
+    if (btn) btn.classList.toggle('primary', !isOpen);
+    if (!isOpen) {
+      /* Focus textarea when opening */
+      var ta = document.getElementById('bulk-textarea');
+      if (ta) { ta.value = ''; setTimeout(function(){ ta.focus(); }, 50); }
+    }
+  }
+
+  function bulkAddMembers() {
+    var ta = document.getElementById('bulk-textarea');
+    var bulkSel = document.getElementById('bulk-group');
+    if (!ta) return;
+    var group = bulkSel ? bulkSel.value : 'Unassigned';
+    var lines = ta.value.split('\n');
+
+    var added = 0, skipped = 0;
+    var existingNames = state.members.map(function(m){ return m.name.toLowerCase(); });
+
+    lines.forEach(function(line) {
+      var name = line.trim();
+      if (!name) return; /* skip blank lines */
+      if (existingNames.indexOf(name.toLowerCase()) !== -1) {
+        skipped++;
+        return; /* skip duplicates */
+      }
+      /* Add to state */
+      state.members.push({ name: name, group: group });
+      existingNames.push(name.toLowerCase()); /* prevent dupes within the same batch */
+      supabaseMemberAdd(name, group);
+      added++;
+    });
+
+    if (added === 0 && skipped === 0) {
+      toast('No names found. Paste at least one name per line.');
+      return;
+    }
+
+    saveState();
+    renderMembers();
+
+    var msg = added + ' member' + (added !== 1 ? 's' : '') + ' added.';
+    if (skipped) msg += ' Skipped ' + skipped + ' duplicate' + (skipped !== 1 ? 's' : '') + '.';
+    toast(msg);
+
+    /* Close panel and clear textarea on success */
+    if (added > 0) {
+      ta.value = '';
+      var panel = document.getElementById('bulk-panel');
+      if (panel) panel.classList.remove('open');
+      var btn = document.getElementById('bulk-toggle-btn');
+      if (btn) btn.classList.remove('primary');
+    }
+  }
+
+  function removeMember(name) {
+    if (!confirm('Remove "' + name + '" from the roster?\n\nTheir past attendance records will also be removed.')) return;
+    state.members = state.members.filter(function(m) { return m.name !== name; });
+    Object.keys(state.records).forEach(function(w) {
+      if (state.records[w] && Object.prototype.hasOwnProperty.call(state.records[w], name)) {
+        delete state.records[w][name];
+      }
+    });
+    saveState();
+    supabaseMemberDelete(name);
+    renderMembers();
+    if (currentDate) renderAttendance(currentDate);
+  }
+
+  /* ── Attendance ── */
+  function loadWeek() {
+    var d = document.getElementById('week-date').value;
+    var err = validateAttendanceDate(d);
+    if (err) {
+      showAttendanceValidation(err);
+      currentDate = '';
+      return;
+    }
+    showAttendanceValidation(null);
+    if (!state.records[d]) state.records[d] = {};
+    currentDate = d;
+    renderAttendance(d);
+  }
+
+  function renderAttendance(date) {
+    var body = document.getElementById('attendance-body');
+    if (!state.members.length) {
+      body.innerHTML = '<div class="empty"><i class="ti ti-users"></i><p>Add members first in the Members tab.</p></div>';
+      return;
+    }
+    var rec = state.records[date] || {};
+    var total = state.members.length;
+    var presentCount = state.members.filter(function(m) { return rec[m.name] === true; }).length;
+    var pct = Math.round((presentCount / total) * 100);
+
+    var groups = groupedMembers();
+    var rowsHtml = '';
+    groups.forEach(function(g, gi) {
+      var groupIndices = g.members.map(function(m) { return state.members.indexOf(m); });
+      var indicesAttr = groupIndices.join(',');
+      var groupId = 'atg-' + gi;
+      var groupPresent = g.members.filter(function(m) { return rec[m.name] === true; }).length;
+      var groupTotal = g.members.length;
+
+      /* Group heading: chevron | name | per-group count | Mark all present | Mark all absent */
+      rowsHtml += '<div class="attend-group-heading" style="cursor:pointer" data-action="toggle-attend-group" data-groupid="' + groupId + '">' +
+        '<span style="display:flex;align-items:center;flex:1;min-width:0">' +
+          '<span class="attend-group-chevron" id="chev-' + groupId + '">▼</span>' +
+          '<i class="ti ti-users-group" style="font-size:12px;vertical-align:-1px;margin-right:5px"></i>' +
+          '<span>' + esc(g.label) + '</span>' +
+          '<span class="attend-group-count" id="gpresent-' + groupId + '">' + groupPresent + '/' + groupTotal + '</span>' +
+        '</span>' +
+        '<span style="display:flex;gap:6px">' +
+          '<button class="btn-sm" style="height:24px;font-size:11px;padding:0 8px" data-action="check-all-group" data-indices="' + indicesAttr + '" data-groupid="' + groupId + '" data-present="true">✓ All present</button>' +
+          '<button class="btn-sm" style="height:24px;font-size:11px;padding:0 8px" data-action="check-all-group" data-indices="' + indicesAttr + '" data-groupid="' + groupId + '" data-present="false">✗ All absent</button>' +
+        '</span>' +
+      '</div>';
+
+      /* Collapsible member rows wrapper */
+      rowsHtml += '<div class="attend-group-body" id="' + groupId + '">';
+      g.members.forEach(function(m) {
+        var idx = state.members.indexOf(m);
+        var isPresent = rec[m.name] === true;
+        rowsHtml += '<div class="attend-row">' +
+          '<input type="checkbox" id="acb-' + idx + '" data-idx="' + idx + '" data-groupid="' + groupId + '"' + (isPresent ? ' checked' : '') + ' onchange="toggleAttend(this)" />' +
+          '<div class="avatar" style="width:28px;height:28px;font-size:11px">' + initials(m.name) + '</div>' +
+          '<label class="a-name" for="acb-' + idx + '">' + esc(m.name) + '</label>' +
+          '<span id="albl-' + idx + '" class="' + (isPresent ? 'present-lbl' : 'absent-lbl') + '">' + (isPresent ? 'Present' : 'Absent') + '</span>' +
+          '</div>';
+      });
+      rowsHtml += '</div>'; /* end attend-group-body */
+    });
+
+    body.innerHTML =
+      '<div class="attend-card">' +
+        '<div class="attend-card-header">' +
+          '<div class="week-name">' + fmtDate(date) + '</div>' +
+          '<span id="present-badge" class="pct-badge ' + pctClass(pct) + '">' + presentCount + '/' + total + ' present</span>' +
+        '</div>' +
+        '<div class="attend-rows">' + rowsHtml + '</div>' +
+      '</div>' +
+      '<div class="save-row">' +
+        '<span class="hint">Auto-saves when you check or uncheck.</span>' +
+        '<button class="primary" onclick="manualSave()"><i class="ti ti-device-floppy"></i> Save record</button>' +
+      '</div>';
+  }
+
+  function toggleAttendGroup(groupId) {
+    var body = document.getElementById(groupId);
+    var chev = document.getElementById('chev-' + groupId);
+    if (!body) return;
+    var collapsed = body.classList.toggle('collapsed');
+    if (chev) chev.textContent = collapsed ? '▶' : '▼';
+  }
+
+  /* Update per-group present count label */
+  function updateGroupBadge(groupId) {
+    var body = document.getElementById(groupId);
+    if (!body) return;
+    var checkboxes = body.querySelectorAll('input[type="checkbox"]');
+    var present = 0, total = checkboxes.length;
+    checkboxes.forEach(function(cb) { if (cb.checked) present++; });
+    var el = document.getElementById('gpresent-' + groupId);
+    if (el) el.textContent = present + '/' + total;
+  }
+
+  function toggleAttend(checkbox) {
+    var idx = parseInt(checkbox.getAttribute('data-idx'), 10);
+    var member = state.members[idx];
+    var name = member.name;
+    var checked = checkbox.checked;
+    var groupId = checkbox.getAttribute('data-groupid');
+
+    if (!state.records[currentDate]) state.records[currentDate] = {};
+    state.records[currentDate][name] = checked;
+    saveState();
+    supabaseAttendanceUpsert(name, currentDate, checked);
+
+    /* Update label */
+    var lbl = document.getElementById('albl-' + idx);
+    if (lbl) {
+      lbl.className = checked ? 'present-lbl' : 'absent-lbl';
+      lbl.textContent = checked ? 'Present' : 'Absent';
+    }
+
+    /* Update per-group badge */
+    if (groupId) updateGroupBadge(groupId);
+
+    /* Update overall badge */
+    var rec = state.records[currentDate];
+    var presentCount = state.members.filter(function(m) { return rec[m.name] === true; }).length;
+    var total = state.members.length;
+    var pct = Math.round((presentCount / total) * 100);
+    var badge = document.getElementById('present-badge');
+    if (badge) {
+      badge.className = 'pct-badge ' + pctClass(pct);
+      badge.textContent = presentCount + '/' + total + ' present';
+    }
+  }
+
+  /* Check all / Uncheck all for a group in the Attendance tab */
+  function checkAllGroup(indices, present, groupId) {
+    if (!currentDate) return;
+    if (!state.records[currentDate]) state.records[currentDate] = {};
+
+    indices.forEach(function(idx) {
+      var member = state.members[idx];
+      if (!member) return;
+      var name = member.name;
+      state.records[currentDate][name] = present;
+      var cb = document.getElementById('acb-' + idx);
+      if (cb) cb.checked = present;
+      var lbl = document.getElementById('albl-' + idx);
+      if (lbl) {
+        lbl.className = present ? 'present-lbl' : 'absent-lbl';
+        lbl.textContent = present ? 'Present' : 'Absent';
+      }
+      supabaseAttendanceUpsert(name, currentDate, present);
+    });
+
+    saveState();
+
+    /* Update per-group badge */
+    if (groupId) updateGroupBadge(groupId);
+
+    /* Update overall badge */
+    var rec = state.records[currentDate];
+    var presentCount = state.members.filter(function(m) { return rec[m.name] === true; }).length;
+    var total = state.members.length;
+    var pct = Math.round((presentCount / total) * 100);
+    var badge = document.getElementById('present-badge');
+    if (badge) {
+      badge.className = 'pct-badge ' + pctClass(pct);
+      badge.textContent = presentCount + '/' + total + ' present';
+    }
+  }
+
+  function manualSave() {
+    saveState();
+    supabaseAttendanceSyncDate(currentDate);
+    toast('Attendance saved!');
+    renderMembers();
+  }
+
+  /* ── History ── */
+  var HIST_PAGE_SIZE = 5;
+  var histShowAll = false;
+
+  function renderHistory() {
+    var weeks = validAttendanceWeeks().slice().sort(function(a, b) { return b.localeCompare(a); });
+    var totalWeeks = weeks.length;
+    var totalMembers = state.members.length;
+    var avgPct = 0;
+    if (totalMembers && totalWeeks) {
+      var sum = 0;
+      state.members.forEach(function(m) { sum += memberAttendance(m.name).pct; });
+      avgPct = Math.round(sum / totalMembers);
+    }
+
+    /* Summary cards — unchanged */
+    document.getElementById('summary-cards').innerHTML =
+      '<div class="stat-card"><div class="slabel">Total members</div><div class="sval">' + totalMembers + '</div></div>' +
+      '<div class="stat-card"><div class="slabel">Dates recorded</div><div class="sval">' + totalWeeks + '</div></div>' +
+      '<div class="stat-card"><div class="slabel">Avg attendance</div><div class="sval">' + (totalMembers && totalWeeks ? avgPct + '%' : '—') + '</div></div>';
+
+    /* Per-member percentage list — unchanged calculations, same cards */
+    var pctList = document.getElementById('pct-list');
+    if (!totalMembers) {
+      pctList.innerHTML = '<div class="empty"><i class="ti ti-users"></i><p>No members yet.</p></div>';
+    } else {
+      var sorted = state.members.map(function(m) {
+        var a = memberAttendance(m.name);
+        return { name: m.name, group: m.group, attended: a.attended, total: a.total, pct: a.pct };
+      }).sort(function(a, b) { return b.pct - a.pct; });
+      pctList.innerHTML = sorted.map(function(m) {
+        var bar = m.total
+          ? '<div class="bar-wrap"><div class="bar-fill" style="width:' + m.pct + '%"></div></div><span class="pct-badge ' + pctClass(m.pct) + '">' + m.pct + '%</span>'
+          : '<span style="font-size:12px;color:var(--text-3)">No data yet</span>';
+        return '<div class="member-card">' +
+          '<div class="avatar">' + initials(m.name) + '</div>' +
+          '<div class="m-info">' +
+            '<div class="m-name">' + esc(m.name) + '<span class="group-tag">' + esc(m.group) + '</span></div>' +
+            '<div class="m-stats">' + m.attended + ' of ' + m.total + ' attendance dates</div>' +
+          '</div>' +
+          bar + '</div>';
+      }).join('');
+    }
+
+    /* By Week — compact rows, show only latest 5 by default */
+    var histList = document.getElementById('history-list');
+    var showMoreRow = document.getElementById('show-more-row');
+    var showMoreBtn = document.getElementById('show-more-btn');
+
+    if (!weeks.length) {
+      histList.innerHTML = '<div class="empty"><i class="ti ti-history"></i><p>No attendance records yet.</p></div>';
+      if (showMoreRow) showMoreRow.style.display = 'none';
+      return;
+    }
+
+    var visibleWeeks = histShowAll ? weeks : weeks.slice(0, HIST_PAGE_SIZE);
+
+    histList.innerHTML = visibleWeeks.map(function(w, i) {
+      var rec = state.records[w] || {};
+      var present = state.members.filter(function(m) { return rec[m.name] === true; }).length;
+      var pct = state.members.length ? Math.round((present / state.members.length) * 100) : 0;
+      var detailId = 'hwd-' + i;
+
+      var memberRows = state.members.map(function(m) {
+        var ok = rec[m.name] === true;
+        return '<div class="hist-row">' +
+          '<i class="ti ' + (ok ? 'ti-circle-check hist-icon ok' : 'ti-circle-x hist-icon no') + '"></i>' +
+          '<span class="hist-name">' + esc(m.name) + '<span class="group-tag">' + esc(m.group) + '</span></span>' +
+          '<span style="font-size:12px;color:' + (ok ? 'var(--green-text)' : 'var(--text-3)') + ';">' + (ok ? 'Present' : 'Absent') + '</span>' +
+          '</div>';
+      }).join('');
+
+      return '<div class="week-compact-row" onclick="toggleHistDetail(\'' + detailId + '\')">' +
+          '<span class="week-compact-date">' + fmtShort(w) + '</span>' +
+          '<span class="week-compact-count">' + present + ' of ' + state.members.length + ' present</span>' +
+          '<span class="pct-badge ' + pctClass(pct) + '">' + pct + '%</span>' +
+        '</div>' +
+        '<div class="week-compact-detail hist-card" id="' + detailId + '">' + memberRows + '</div>';
+    }).join('');
+
+    /* Show more / show less button */
+    if (showMoreRow) {
+      if (weeks.length > HIST_PAGE_SIZE) {
+        showMoreRow.style.display = 'block';
+        if (showMoreBtn) showMoreBtn.textContent = histShowAll ? 'Show less' : 'Show more (' + (weeks.length - HIST_PAGE_SIZE) + ' more)';
+      } else {
+        showMoreRow.style.display = 'none';
+      }
+    }
+  }
+
+  function toggleHistSection(sectionId, headerEl) {
+    var sec = document.getElementById(sectionId);
+    if (!sec) return;
+    var isOpen = sec.style.display !== 'none';
+    sec.style.display = isOpen ? 'none' : 'block';
+    var chev = headerEl.querySelector('.hist-section-chevron');
+    if (chev) chev.textContent = isOpen ? '▼' : '▲';
+  }
+
+  function toggleHistDetail(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = el.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function toggleShowMore() {
+    histShowAll = !histShowAll;
+    renderHistory();
+    /* Keep the By Week section open */
+    var weekSec = document.getElementById('week-section');
+    if (weekSec) weekSec.style.display = 'block';
+    var chev = document.getElementById('week-section-chev');
+    if (chev) chev.textContent = '▲';
+  }
+
+  function toggleHist(id) {
+    /* kept for backward compat — delegates to toggleHistDetail */
+    toggleHistDetail(id);
+  }
+
+  /* ── Init ── */
+  loadState();
+  setupDelegation();
+  document.getElementById('week-date').value = todayISO();
+  document.getElementById('topbar-date').textContent =
+    new Date().toLocaleDateString('en-PH', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  /* ── Auth UI helpers ── */
+
+  /* Load all app data from Supabase and rebuild state — called after every login/session restore */
+  async function loadFromSupabase() {
+    var client = getSupabaseClient();
+    if (!client) { console.warn('[Load] Supabase client not available.'); return; }
+    console.log('[Load] Loading data from Supabase...');
+
+    try {
+      /* 1. Load groups — ordered by name */
+      var gRes = await client.from('groups').select('id, name').order('name');
+      if (gRes.error) throw new Error('groups: ' + gRes.error.message);
+      var groupNames = gRes.data.map(function(g) { return g.name; });
+      /* Always ensure Unassigned is present */
+      if (groupNames.indexOf('Unassigned') === -1) groupNames.push('Unassigned');
+      state.groups = groupNames;
+      console.log('[Load] Groups loaded:', groupNames.length);
+
+      /* 2. Load members with their group names via join */
+      var mRes = await client.from('members').select('id, name, group_id, groups(name)').order('name');
+      if (mRes.error) throw new Error('members: ' + mRes.error.message);
+      state.members = mRes.data.map(function(m) {
+        return {
+          name:    m.name,
+          group:   (m.groups && m.groups.name) ? m.groups.name : 'Unassigned',
+          id:      m.id,
+          groupId: m.group_id
+        };
+      });
+      console.log('[Load] Members loaded:', state.members.length);
+
+      /* 3. Load attendance records */
+      var aRes = await client.from('attendance_records')
+        .select('week_date, present, members(name)')
+        .order('week_date');
+      if (aRes.error) throw new Error('attendance_records: ' + aRes.error.message);
+      state.records = {};
+      aRes.data.forEach(function(row) {
+        var mName = row.members && row.members.name;
+        if (!mName || !isValidISODate(row.week_date)) return;
+        if (!state.records[row.week_date]) state.records[row.week_date] = {};
+        state.records[row.week_date][mName] = row.present === true;
+      });
+      console.log('[Load] Attendance records loaded for', Object.keys(state.records).length, 'dates');
+
+      /* 4. Load tracker_start_date from app_settings */
+      await loadTrackerStartDate();
+
+      /* 5. Cache to localStorage as backup */
+      saveState();
+      console.log('[Load] All data loaded from Supabase successfully.');
+
+    } catch (err) {
+      console.error('[Load] Supabase load failed:', err.message);
+      toast('⚠️ Could not load data from database. Showing cached data.');
+      /* Fall back to localStorage */
+      loadState();
+    }
+  }
+
+  function showWelcome() {
+    document.getElementById('overlay-welcome').classList.remove('hidden');
+    document.getElementById('overlay-signin').classList.add('hidden');
+    var errEl = document.getElementById('signin-error');
+    if (errEl) { errEl.classList.remove('visible'); errEl.textContent = ''; }
+    document.getElementById('signin-email').value = '';
+    /* Clear and reset password field */
+    var pw = document.getElementById('signin-password');
+    if (pw) { pw.value = ''; pw.type = 'password'; }
+    var icon = document.getElementById('pw-toggle-icon');
+    if (icon) icon.className = 'ti ti-eye';
+  }
+  function showSignIn() {
+    document.getElementById('overlay-welcome').classList.add('hidden');
+    document.getElementById('overlay-signin').classList.remove('hidden');
+    setTimeout(function(){ document.getElementById('signin-email').focus(); }, 80);
+  }
+  async function showDashboard() {
+    document.getElementById('overlay-welcome').classList.add('hidden');
+    document.getElementById('overlay-signin').classList.add('hidden');
+    document.getElementById('logout-btn').classList.add('visible');
+    /* Load fresh data from Supabase, then render Members */
+    await loadFromSupabase();
+    applyDateConstraints();
+    switchPage('members');
+  }
+  function hideDashboard() {
+    document.getElementById('logout-btn').classList.remove('visible');
+  }
+  function togglePwVisibility() {
+    var pw   = document.getElementById('signin-password');
+    var icon = document.getElementById('pw-toggle-icon');
+    if (!pw) return;
+    if (pw.type === 'password') { pw.type = 'text';     if (icon) icon.className = 'ti ti-eye-off'; }
+    else                        { pw.type = 'password'; if (icon) icon.className = 'ti ti-eye'; }
+  }
+  async function handleSignIn() {
+    var email  = document.getElementById('signin-email').value.trim();
+    var pwEl   = document.getElementById('signin-password');
+    var errEl  = document.getElementById('signin-error');
+    errEl.classList.remove('visible');
+    if (!email || !pwEl.value) {
+      errEl.textContent = 'Please enter your email and password.';
+      errEl.classList.add('visible'); return;
+    }
+    var client = getSupabaseClient();
+    if (!client) { errEl.textContent = 'Connection error. Please try again.'; errEl.classList.add('visible'); return; }
+    try {
+      var res = await client.auth.signInWithPassword({ email: email, password: pwEl.value });
+      if (res.error) {
+        errEl.textContent = 'Invalid email or password.';
+        errEl.classList.add('visible');
+        pwEl.value = ''; pwEl.type = 'password';
+        var icon = document.getElementById('pw-toggle-icon');
+        if (icon) icon.className = 'ti ti-eye';
+        pwEl.focus();
+        console.warn('[Auth] Sign in failed:', res.error.message);
+      } else {
+        showDashboard();
+        console.log('[Auth] Signed in:', res.data.user.email);
+      }
+    } catch (err) {
+      errEl.textContent = 'Connection error. Please try again.';
+      errEl.classList.add('visible');
+      pwEl.value = '';
+      console.warn('[Auth] Unexpected error:', err.message);
+    }
+  }
+  async function handleLogout() {
+    var client = getSupabaseClient();
+    if (client) { try { await client.auth.signOut(); } catch(e) {} }
+    hideDashboard();
+    showWelcome();
+    console.log('[Auth] Signed out.');
+  }
+  async function checkAuthSession() {
+    var client = getSupabaseClient();
+    if (!client) { showWelcome(); return; }
+    try {
+      var res = await client.auth.getSession();
+      if (res.data && res.data.session) {
+        console.log('[Auth] Session restored:', res.data.session.user.email);
+        await showDashboard();
+      } else { showWelcome(); }
+    } catch (err) { console.warn('[Auth] Session check failed:', err.message); showWelcome(); }
+  }
+
+  /* ── Supabase (Phase 1 — connection test only) ── */
+  /* TODO: Replace these placeholder values with your real Supabase credentials */
+  var SUPABASE_URL      = 'https://mlxfijwuqcvjdanfsblk.supabase.co';
+  var SUPABASE_ANON_KEY = 'sb_publishable_b8eBJIyUcP0ineDdKGTuDg_SONnmID1';
+
+  var _supabaseClient = null;
+
+  function getSupabaseClient() {
+    if (_supabaseClient) return _supabaseClient;
+    if (!window.supabase) {
+      console.error('[Supabase] SDK not loaded. Check your internet connection or CDN.');
+      return null;
+    }
+    _supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    return _supabaseClient;
+  }
+
+  /* ── Supabase Phase 2A — Groups dual-write ── */
+  /* Each function fires AFTER localStorage is already saved.
+     If Supabase fails, a console warning is shown but the app keeps working. */
+
+  async function supabaseGroupAdd(name) {
+    var client = getSupabaseClient();
+    if (!client) return;
+    try {
+      var res = await client.from('groups').insert({ name: name });
+      if (res.error) {
+        console.warn('[Supabase] ⚠️  Failed to insert group "' + name + '":', res.error.message);
+      } else {
+        console.log('[Supabase] ✅ Group added to Supabase:', name);
+      }
+    } catch (err) {
+      console.warn('[Supabase] ⚠️  Unexpected error adding group:', err.message);
+    }
+  }
+
+  async function supabaseGroupRename(oldName, newName) {
+    var client = getSupabaseClient();
+    if (!client) return;
+    try {
+      var res = await client.from('groups').update({ name: newName }).eq('name', oldName);
+      if (res.error) {
+        console.warn('[Supabase] ⚠️  Failed to rename group "' + oldName + '" → "' + newName + '":', res.error.message);
+      } else {
+        console.log('[Supabase] ✅ Group renamed in Supabase:', oldName, '→', newName);
+      }
+    } catch (err) {
+      console.warn('[Supabase] ⚠️  Unexpected error renaming group:', err.message);
+    }
+  }
+
+  async function supabaseGroupDelete(name) {
+    var client = getSupabaseClient();
+    if (!client) return;
+    try {
+      var res = await client.from('groups').delete().eq('name', name);
+      if (res.error) {
+        console.warn('[Supabase] ⚠️  Failed to delete group "' + name + '":', res.error.message);
+      } else {
+        console.log('[Supabase] ✅ Group deleted from Supabase:', name);
+      }
+    } catch (err) {
+      console.warn('[Supabase] ⚠️  Unexpected error deleting group:', err.message);
+    }
+  }
+
+  /* ── Supabase Phase 2B — Members dual-write ── */
+
+  /* Helper: look up group_id from Supabase by group name. Returns null for Unassigned. */
+  async function supabaseGetGroupId(groupName) {
+    if (!groupName || groupName === 'Unassigned') return null;
+    var client = getSupabaseClient();
+    if (!client) return null;
+    try {
+      var res = await client.from('groups').select('id').eq('name', groupName).single();
+      if (res.error || !res.data) {
+        console.warn('[Supabase] ⚠️  Could not find group_id for "' + groupName + '":', (res.error && res.error.message) || 'No data');
+        return null;
+      }
+      return res.data.id;
+    } catch (err) {
+      console.warn('[Supabase] ⚠️  Unexpected error fetching group_id:', err.message);
+      return null;
+    }
+  }
+
+  async function supabaseMemberAdd(name, groupName) {
+    var client = getSupabaseClient();
+    if (!client) return;
+    try {
+      var groupId = await supabaseGetGroupId(groupName);
+      var res = await client.from('members').insert({ name: name, group_id: groupId });
+      if (res.error) {
+        console.warn('[Supabase] ⚠️  Failed to insert member "' + name + '":', res.error.message);
+      } else {
+        console.log('[Supabase] ✅ Member added to Supabase:', name, '| group_id:', groupId);
+      }
+    } catch (err) {
+      console.warn('[Supabase] ⚠️  Unexpected error adding member:', err.message);
+    }
+  }
+
+  async function supabaseMemberDelete(name) {
+    var client = getSupabaseClient();
+    if (!client) return;
+    try {
+      var res = await client.from('members').delete().eq('name', name);
+      if (res.error) {
+        console.warn('[Supabase] ⚠️  Failed to delete member "' + name + '":', res.error.message);
+      } else {
+        console.log('[Supabase] ✅ Member deleted from Supabase:', name);
+      }
+    } catch (err) {
+      console.warn('[Supabase] ⚠️  Unexpected error deleting member:', err.message);
+    }
+  }
+
+  async function supabaseMemberUpdateGroup(name, groupName) {
+    var client = getSupabaseClient();
+    if (!client) return;
+    try {
+      var groupId = await supabaseGetGroupId(groupName);
+      var res = await client.from('members').update({ group_id: groupId }).eq('name', name);
+      if (res.error) {
+        console.warn('[Supabase] ⚠️  Failed to update group for member "' + name + '":', res.error.message);
+      } else {
+        console.log('[Supabase] ✅ Member group updated in Supabase:', name, '→', groupName, '| group_id:', groupId);
+      }
+    } catch (err) {
+      console.warn('[Supabase] ⚠️  Unexpected error updating member group:', err.message);
+    }
+  }
+
+  /* ── Supabase Phase 2C — Attendance dual-write ── */
+
+  /* Upsert a single attendance record for one member on one date */
+  async function supabaseAttendanceUpsert(memberName, weekDate, present) {
+    var client = getSupabaseClient();
+    if (!client) return;
+    try {
+      /* Look up member_id by name */
+      var mRes = await client.from('members').select('id').eq('name', memberName).single();
+      if (mRes.error || !mRes.data) {
+        console.warn('[Supabase] ⚠️  Cannot upsert attendance — member not found in Supabase:', memberName);
+        return;
+      }
+      var memberId = mRes.data.id;
+      var res = await client.from('attendance_records').upsert(
+        { member_id: memberId, week_date: weekDate, present: present },
+        { onConflict: 'member_id,week_date' }
+      );
+      if (res.error) {
+        console.warn('[Supabase] ⚠️  Failed to upsert attendance for "' + memberName + '" on ' + weekDate + ':', res.error.message);
+      } else {
+        console.log('[Supabase] ✅ Attendance saved:', memberName, weekDate, present ? 'Present' : 'Absent');
+      }
+    } catch (err) {
+      console.warn('[Supabase] ⚠️  Unexpected error upserting attendance:', err.message);
+    }
+  }
+
+  /* Sync all members' attendance for a full date (used by Save Record button) */
+  async function supabaseAttendanceSyncDate(weekDate) {
+    if (!weekDate) return;
+    var client = getSupabaseClient();
+    if (!client) return;
+    var rec = state.records[weekDate] || {};
+    console.log('[Supabase] Syncing attendance for', weekDate, '...');
+    /* Fire upserts for every member in parallel */
+    var promises = state.members.map(function(m) {
+      var present = rec[m.name] === true;
+      return supabaseAttendanceUpsert(m.name, weekDate, present);
+    });
+    try {
+      await Promise.all(promises);
+      console.log('[Supabase] ✅ Full attendance sync complete for', weekDate);
+    } catch (err) {
+      console.warn('[Supabase] ⚠️  Some attendance records may not have synced:', err.message);
+    }
+  }
+
+  async function testSupabaseConnection() {
+    console.log('[Supabase] Testing connection...');
+    var client = getSupabaseClient();
+    if (!client) { console.warn('[Supabase] SDK not available.'); return; }
+    try {
+      var tables = ['groups', 'members', 'attendance_records'];
+      for (var i = 0; i < tables.length; i++) {
+        var res = await client.from(tables[i]).select('id').limit(1);
+        if (res.error) { console.warn('[Supabase] ❌ ' + tables[i] + ':', res.error.message); }
+        else            { console.log('[Supabase] ✅ ' + tables[i] + ': reachable'); }
+      }
+    } catch (err) {
+      console.warn('[Supabase] ❌ Unexpected error:', err.message);
+    }
+  }
+
+  /* ── Supabase Settings sync ── */
+  async function supabaseSettingsSave(key, value) {
+    var client = getSupabaseClient();
+    if (!client) return;
+    try {
+      var res = await client.from('app_settings').upsert(
+        { setting_key: key, setting_value: value, updated_at: new Date().toISOString() },
+        { onConflict: 'setting_key' }
+      );
+      if (res.error) {
+        console.warn('[Supabase] ⚠️  Failed to save setting "' + key + '":', res.error.message);
+      } else {
+        console.log('[Supabase] ✅ Setting saved:', key, '=', value);
+      }
+    } catch (err) {
+      console.warn('[Supabase] ⚠️  Unexpected error saving setting:', err.message);
+    }
+  }
+
+  async function supabaseSettingsLoad(key) {
+    var client = getSupabaseClient();
+    if (!client) return null;
+    try {
+      var res = await client
+        .from('app_settings')
+        .select('setting_value')
+        .eq('setting_key', key)
+        .single();
+      if (res.error || !res.data) return null;
+      return res.data.setting_value;
+    } catch (err) {
+      console.warn('[Supabase] ⚠️  Unexpected error loading setting:', err.message);
+      return null;
+    }
+  }
+
+  /* ── Edit member ── */
+  function saveMemberEdit(editRowId) {
+    var row = document.getElementById(editRowId);
+    if (!row) return;
+    var nameInp = row.querySelector('.medit-name');
+    var groupSel = row.querySelector('.medit-group');
+    if (!nameInp) return;
+
+    var newName  = nameInp.value.trim();
+    var newGroup = groupSel ? groupSel.value : 'Unassigned';
+    var origName = row.getAttribute('data-origname');
+
+    if (!newName) { toast('Name cannot be blank.'); nameInp.focus(); return; }
+    if (newName.toLowerCase() !== origName.toLowerCase()) {
+      var dup = state.members.some(function(m) {
+        return m.name !== origName && m.name.toLowerCase() === newName.toLowerCase();
+      });
+      if (dup) { toast('"' + newName + '" already exists.'); nameInp.focus(); return; }
+    }
+
+    /* Update state */
+    state.members.forEach(function(m) {
+      if (m.name === origName) { m.name = newName; m.group = newGroup; }
+    });
+
+    /* Rename attendance record keys if name changed */
+    if (newName !== origName) {
+      Object.keys(state.records).forEach(function(d) {
+        if (state.records[d] && Object.prototype.hasOwnProperty.call(state.records[d], origName)) {
+          state.records[d][newName] = state.records[d][origName];
+          delete state.records[d][origName];
+        }
+      });
+    }
+
+    saveState();
+    supabaseMemberUpdate(origName, newName, newGroup);
+    renderMembers();
+    if (currentDate) renderAttendance(currentDate);
+    toast('Member updated.');
+  }
+
+  async function supabaseMemberUpdate(origName, newName, newGroup) {
+    var client = getSupabaseClient();
+    if (!client) return;
+    try {
+      var groupId = null;
+      if (newGroup && newGroup !== 'Unassigned') {
+        var gRes = await client.from('groups').select('id').eq('name', newGroup).single();
+        if (!gRes.error && gRes.data) groupId = gRes.data.id;
+      }
+      var res = await client.from('members')
+        .update({ name: newName, group_id: groupId })
+        .eq('name', origName);
+      if (res.error) {
+        console.warn('[Supabase] ⚠️  Failed to update member "' + origName + '":', res.error.message);
+      } else {
+        console.log('[Supabase] ✅ Member updated:', origName, '→', newName, '| group:', newGroup);
+      }
+    } catch (err) {
+      console.warn('[Supabase] ⚠️  Unexpected error updating member:', err.message);
+    }
+  }
+
+  window.switchPage          = switchPage;
+  window.addMember           = addMember;
+  window.toggleBulkPanel     = toggleBulkPanel;
+  window.bulkAddMembers      = bulkAddMembers;
+  window.addGroup            = addGroup;
+  window.deleteGroup         = deleteGroup;
+  window.confirmEditGroup    = confirmEditGroup;
+  window.moveUngrouped       = moveUngrouped;
+  window.loadWeek            = loadWeek;
+  window.toggleAttend        = toggleAttend;
+  window.toggleAttendGroup   = toggleAttendGroup;
+  window.manualSave          = manualSave;
+  window.toggleHist          = toggleHist;
+  window.toggleHistSection   = toggleHistSection;
+  window.toggleHistDetail    = toggleHistDetail;
+  window.toggleShowMore      = toggleShowMore;
+  window.saveSettings        = saveSettings;
+  window.testSupabaseConnection = testSupabaseConnection;
+  window.saveMemberEdit      = saveMemberEdit;
+  window.supabaseMemberAdd         = supabaseMemberAdd;
+  window.supabaseMemberDelete      = supabaseMemberDelete;
+  window.supabaseMemberUpdateGroup = supabaseMemberUpdateGroup;
+  /* delegation helpers (called from data-action, but expose anyway) */
+  window.toggleEl            = toggleEl;
+  window.hideEl              = hideEl;
+  /* Auth */
+  window.showWelcome         = showWelcome;
+  window.showSignIn          = showSignIn;
+  window.handleSignIn        = handleSignIn;
+  window.handleLogout        = handleLogout;
+  window.togglePwVisibility  = togglePwVisibility;
+</script>
+<!-- Supabase JS SDK — loaded last so it never blocks app functions -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="checkAuthSession()"></script>
+</body>
+</html>

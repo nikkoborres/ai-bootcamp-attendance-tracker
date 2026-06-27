@@ -59,8 +59,8 @@
       height: 58px; position: sticky; top: 0; z-index: 10;
     }
     .topbar-icon {
-      width: 32px; height: 32px; background: var(--green-bg); border-radius: 8px;
-      display: flex; align-items: center; justify-content: center; color: var(--green-text); font-size: 18px;
+      width: 44px; height: 44px; background: var(--green-bg); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; color: var(--green-text); font-size: 22px;
     }
     .topbar-title { font-size: 16px; font-weight: 600; color: var(--text); }
     .topbar-sub { font-size: 13px; color: var(--text-2); margin-left: auto; }
@@ -100,13 +100,13 @@
     .page.active { display: block; }
     .page-title { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
     .page-sub { font-size: 14px; color: var(--text-2); margin-bottom: 1.5rem; }
-    input[type="text"], input[type="date"], input[type="search"] {
+    input[type="text"], input[type="date"], input[type="search"], input[type="tel"], input[type="email"], input[type="password"] {
       height: 38px; border: 0.5px solid var(--border-md); border-radius: var(--radius);
       padding: 0 12px; font-size: 14px; font-family: inherit;
       background: var(--surface); color: var(--text); outline: none;
       transition: border-color 0.15s, box-shadow 0.15s;
     }
-    input[type="text"]:focus, input[type="date"]:focus, input[type="search"]:focus {
+    input[type="text"]:focus, input[type="date"]:focus, input[type="search"]:focus, input[type="tel"]:focus, input[type="email"]:focus, input[type="password"]:focus {
       border-color: var(--green); box-shadow: 0 0 0 3px rgba(29,158,117,0.12);
     }
     button {
@@ -437,6 +437,36 @@
     .csv-status-warn { color: var(--amber-text); font-weight: 600; }
     .csv-status-error { color: var(--red-text); font-weight: 600; }
     .csv-phase-note { font-size: 12px; color: var(--text-2); margin-top: 10px; }
+    @keyframes csvSpin { to { transform: rotate(360deg); } }
+    .csv-progress-pill {
+      display: none; align-items: center; gap: 8px;
+      background: var(--green); border: none;
+      border-radius: 20px; padding: 0 14px; height: 36px;
+      font-size: 13px; font-weight: 500; color: #fff; white-space: nowrap;
+    }
+    .csv-progress-pill.visible { display: inline-flex; }
+    .csv-progress-spinner {
+      width: 14px; height: 14px; flex-shrink: 0;
+      border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff;
+      border-radius: 50%; animation: csvSpin .7s linear infinite;
+    }
+    .csv-progress-bar-wrap {
+      display: none; height: 4px; background: var(--surface2);
+      border-radius: 2px; margin-top: 10px; overflow: hidden;
+    }
+    .csv-progress-bar-wrap.visible { display: block; }
+    .csv-progress-bar-fill {
+      height: 100%; background: var(--green);
+      border-radius: 2px; width: 0%; transition: width 0.3s ease;
+    }
+    .csv-progress-stats {
+      display: none; font-size: 12px; color: var(--text-2);
+      margin-top: 5px; justify-content: space-between; align-items: center;
+    }
+    .csv-progress-stats.visible { display: flex; }
+    @media (max-width: 640px) {
+      .csv-progress-pill.visible { display: flex; width: 100%; justify-content: center; }
+    }
     @media (max-width: 720px) { .csv-summary-grid { grid-template-columns: 1fr 1fr; } }
     /* ── Collapsible attendance groups ── */
     .attend-group-body { }
@@ -606,7 +636,7 @@
       object-fit: contain; display: block;
     }
     .brand-logo-topbar {
-      width: 20px; height: 20px; object-fit: contain; display: none;
+      width: 32px; height: 32px; object-fit: contain; display: none;
       border-radius: 4px;
     }
     .topbar-icon.has-logo #topbar-fallback-icon { display: none; }
@@ -699,7 +729,8 @@
     @media (max-width: 520px) {
       .saved-logo-grid { grid-template-columns: 1fr; }
       .settings-logo-actions { flex-direction: column; align-items: stretch; }
-      .settings-file-trigger, .settings-logo-actions button { width: 100%; justify-content: center; }
+      .settings-file-trigger,
+      .settings-logo-actions button:not(.saved-logo-remove):not(.saved-logo-download):not(.saved-logo-select):not(.saved-logo-default) { width: 100%; justify-content: center; }
       .settings-logo-preview-card { max-width: none; }
     }
 
@@ -729,8 +760,8 @@
       color: var(--green-text);
     }
     .topbar-icon.has-logo .brand-logo-topbar {
-      width: 28px;
-      height: 28px;
+      width: 40px;
+      height: 40px;
       border-radius: 0;
       object-fit: contain;
     }
@@ -853,6 +884,14 @@
     .saved-logo-download {
       pointer-events: auto !important;
       cursor: pointer !important;
+      width: 24px !important;
+      height: 24px !important;
+    }
+    .saved-logo-default {
+      pointer-events: auto !important;
+      cursor: pointer !important;
+      width: 24px !important;
+      height: 24px !important;
     }
     .saved-logo-remove i,
     .saved-logo-download i {
@@ -1038,7 +1077,6 @@
     /* ── v158 Neutral Public Background Polish ── */
     #overlay-welcome {
       position: fixed;
-      overflow: hidden;
       background-color: var(--bg);
     }
     #overlay-welcome::before,
@@ -1074,7 +1112,8 @@
       position: relative;
       z-index: 1;
     }
-    #overlay-welcome .welcome-leader-btn {
+    #overlay-welcome .welcome-leader-btn,
+    #overlay-register .welcome-leader-btn {
       position: fixed;
       top: 1rem;
       right: 1.25rem;
@@ -1151,22 +1190,40 @@
     .signin-actions button i { font-size: 16px; }
     /* Logout button in topbar */
     .topbar-logout {
-      margin-left: auto; height: 30px; padding: 0 12px; font-size: 12px;
-      border-radius: 20px; border: 0.5px solid var(--border-md);
-      background: none; color: var(--text-2); cursor: pointer; font-family: inherit;
-      display: none; align-items: center; gap: 5px; transition: background 0.12s;
+      margin-left: auto; height: 36px; padding: 0 16px; font-size: 13px; font-weight: 600;
+      border-radius: 20px; border: 1px solid var(--border-md);
+      background: var(--surface); color: var(--text); cursor: pointer; font-family: inherit;
+      display: none; align-items: center; gap: 6px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s, background 0.15s;
     }
-    .topbar-logout:hover { background: var(--surface2); }
+    .topbar-logout:hover {
+      background: var(--surface2); transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    }
     .topbar-logout.visible { display: flex; }
     /* ── Public check-in form ── */
     .welcome-leader-btn {
-      position: fixed; top: 1rem; right: 1.25rem; z-index: 201;
-      height: 32px; padding: 0 14px; font-size: 12px; font-family: inherit;
-      border-radius: 20px; border: 0.5px solid var(--border-md);
-      background: var(--surface); color: var(--text-2); cursor: pointer;
-      display: flex; align-items: center; gap: 5px; transition: background 0.12s;
+      height: 36px; padding: 0 16px; font-size: 13px; font-weight: 600;
+      font-family: inherit;
+      border-radius: 20px; border: 1px solid var(--border-md);
+      background: var(--surface); color: var(--text);
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s, background 0.15s;
+      animation: leaderPulse 3s ease-in-out infinite;
     }
-    .welcome-leader-btn:hover { background: var(--surface2); color: var(--text); }
+    .welcome-leader-btn:hover {
+      background: var(--surface2); transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    }
+    @keyframes leaderPulse {
+      0%, 100% { box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+      50% { box-shadow: 0 2px 16px rgba(0,0,0,0.15); }
+    }
+    .leader-btn-icon, .leader-btn-text, .leader-btn-title,
+    .leader-btn-sub, .leader-btn-arrow { display: none; }
     .checkin-card {
       background: var(--surface); border: 0.5px solid var(--border);
       border-radius: var(--radius-lg); padding: 28px 28px;
@@ -1190,12 +1247,39 @@
     }
     .checkin-error.visible { display: block; }
     .checkin-success {
-      font-size: 14px; color: var(--green-text); background: var(--green-bg);
-      border-radius: var(--radius); padding: 12px 14px; margin-bottom: 12px;
-      display: none; align-items: center; justify-content: center; gap: 8px;
-      text-align: center;
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 28px 20px 20px; margin-bottom: 12px;
+      background: var(--green-bg); border-radius: var(--radius-lg);
+      border: 0.5px solid rgba(29,158,117,0.15);
     }
-    .checkin-success.visible { display: flex; }
+    .checkin-success.visible { display: flex; animation: checkinFadeIn 0.4s ease; }
+    .checkin-success-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: rgba(29,158,117,0.15); color: var(--green-text);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; margin-bottom: 14px;
+    }
+    .checkin-success-icon .ti { animation: checkinPop 0.5s ease 0.2s both; }
+    .checkin-success-title { font-size: 18px; font-weight: 700; color: var(--green-text); margin-bottom: 4px; }
+    .checkin-success-sub { font-size: 13px; color: var(--text-2); line-height: 1.4; }
+    .checkin-error-card {
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 28px 20px 20px; margin-bottom: 12px;
+      background: var(--red-bg); border-radius: var(--radius-lg);
+      border: 0.5px solid rgba(163,45,45,0.15);
+    }
+    .checkin-error-card.visible { display: flex; animation: checkinFadeIn 0.4s ease; }
+    .checkin-error-card-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: rgba(163,45,45,0.15); color: var(--red-text);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; margin-bottom: 14px;
+    }
+    .checkin-error-card-icon .ti { animation: checkinPop 0.5s ease 0.2s both; }
+    .checkin-error-card-title { font-size: 18px; font-weight: 700; color: var(--red-text); margin-bottom: 4px; }
+    .checkin-error-card-sub { font-size: 13px; color: var(--text-2); line-height: 1.4; }
+    @keyframes checkinFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes checkinPop { from { transform: scale(0); } 60% { transform: scale(1.2); } to { transform: scale(1); } }
     .welcome-divider {
       width: 100%; max-width: 420px; text-align: center;
       font-size: 12px; color: var(--text-3); margin: 1.5rem 0 0;
@@ -1464,8 +1548,8 @@
       }
       .topbar-logout {
         margin-left: auto;
-        height: 30px;
-        padding: 0 10px;
+        height: 34px;
+        padding: 0 14px;
         font-size: 12px;
         flex-shrink: 0;
       }
@@ -1576,6 +1660,7 @@
       input[type="text"],
       input[type="date"],
       input[type="search"],
+      input[type="tel"],
       select {
         min-height: 40px;
       }
@@ -1817,22 +1902,36 @@
         height: 44px;
         font-size: 16px; /* prevents iOS zoom */
       }
-      .welcome-leader-btn {
-        top: 12px;
-        right: 12px;
-        height: 30px;
-        padding: 0 12px;
-      }
-      .welcome-divider {
-        margin-top: 1.1rem;
-        line-height: 1.4;
-      }
 
       .toast {
         bottom: calc(88px + env(safe-area-inset-bottom));
         max-width: calc(100vw - 28px);
         text-align: center;
       }
+    }
+
+    /* Height-aware compression for the public pages — independent of width.
+       Targets short viewports caused by browser toolbars/bookmarks bars being
+       shown, landscape phones, or any case where vertical space is tight.
+       Same layout and placement throughout — only sizing is reduced. */
+    @media (max-height: 750px) {
+      .auth-overlay { padding-top: 3.75rem; }
+      .auth-brand { margin-bottom: 0.75rem; }
+      .auth-brand-icon { width: 36px; height: 36px; margin-bottom: 8px; }
+      .auth-brand h1 { font-size: 17px; }
+      .checkin-card, .signin-card, .register-card { padding: 18px 20px; }
+      .checkin-card h2 { font-size: 17px; margin-bottom: 2px; }
+      .checkin-card .checkin-sub { margin-bottom: 12px; }
+      .qr-checkin-card { padding: 16px 14px; margin-bottom: 10px; }
+      #register-not-cop-wrap { margin-top: 10px; }
+      .register-not-cop-link { padding: 12px 14px; }
+    }
+    @media (max-height: 560px) {
+      .auth-overlay { padding-top: 3.5rem; }
+      .auth-brand { margin-bottom: 0.5rem; }
+      .auth-brand-icon { width: 30px; height: 30px; margin-bottom: 6px; }
+      .auth-brand h1 { font-size: 15px; }
+      .public-brand-sub, .auth-brand p { font-size: 12px; margin-top: 2px; }
     }
 
 
@@ -1902,8 +2001,8 @@
     .qr-checkin-icon { display: none; }
     .qr-checkin-title { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
     .qr-checkin-copy { font-size: 13px; color: var(--text-2); line-height: 1.45; margin-bottom: 14px; }
-    #qr-reader { display: none; margin-top: 12px; overflow: hidden; border-radius: 14px; background: var(--surface); }
-    #qr-reader video { border-radius: 14px; }
+    #qr-reader { display: none; margin-top: 12px; overflow: hidden; border-radius: 14px; background: var(--surface); max-height: min(300px, 42vh) !important; max-height: min(300px, 42dvh) !important; }
+    #qr-reader video { border-radius: 14px; max-height: min(300px, 42vh) !important; max-height: min(300px, 42dvh) !important; object-fit: cover; }
     .fallback-links {
       display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
       gap: 6px; margin: 12px 0 6px; color: var(--text-3); font-size: 13px;
@@ -2003,9 +2102,10 @@
     }
     .member-add-row {
       display: grid;
-      grid-template-columns: minmax(300px, 2fr) minmax(220px, 1.35fr) minmax(180px, 1.1fr) max-content;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.35fr) minmax(0, 1.1fr);
       align-items: end;
       gap: 8px;
+      margin-bottom: 10px;
     }
     .group-add-row-main {
       display: grid;
@@ -2022,6 +2122,16 @@
       .group-add-row-main button {
         width: 100%;
         justify-content: center;
+      }
+      /* Force add member button row to full width on mobile */
+      #add-member-btn-row {
+        display: block !important;
+      }
+      #add-member-btn-row > div {
+        grid-column: unset !important;
+      }
+      #add-member-btn {
+        width: 100% !important;
       }
     }
 
@@ -2048,9 +2158,16 @@
 
     /* ── v146 Add Member button alignment fix ── */
     .member-add-row > button.primary {
-      min-width: 150px;
+      width: 100%;
       justify-content: center;
       margin-left: 0;
+    }
+    /* Ellipsis for long group names in the select dropdown */
+    .member-add-row .form-field select,
+    .member-add-row .form-field select option {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
     }
     .member-add-row .form-field {
       justify-content: end;
@@ -2353,6 +2470,73 @@
     /* Active logo can load from Supabase settings; custom local logo deletion asks for confirmation first. */
 
 
+
+    /* ── Non-COP Member Registration ── */
+    .register-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 26px 24px 24px;
+      width: 100%; max-width: 420px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+      text-align: center;
+    }
+    .register-icon-badge {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--green-bg); color: var(--green-text);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 22px; margin: 0 auto 12px;
+    }
+    .register-field {
+      display: flex; flex-direction: column; gap: 6px;
+      margin-bottom: 13px; text-align: left;
+    }
+    .register-field label { font-size: 12px; font-weight: 600; color: var(--text-2); }
+    .register-field input { width: 100%; height: 42px; box-sizing: border-box; }
+    .register-error {
+      display: none; padding: 9px 12px; border-radius: var(--radius);
+      font-size: 13px; line-height: 1.4; text-align: center;
+      background: var(--red-bg); color: var(--red-text);
+      border: 0.5px solid rgba(163,45,45,0.18);
+      margin-bottom: 12px;
+    }
+    .register-error.visible { display: block; }
+    .register-success-box { display: none; text-align: center; padding: 4px 0 8px; }
+    .register-success-box.visible { display: block; }
+    .register-qr-wrap {
+      background: #fff; border-radius: 14px; padding: 16px;
+      display: inline-block; margin: 14px auto;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    .register-qr-wrap img { display: block; width: 180px; height: 180px; }
+    .register-qr-name { font-size: 16px; font-weight: 600; color: var(--green-text); margin-top: 6px; }
+    .register-qr-hint { font-size: 12px; color: var(--text-2); margin-top: 8px; line-height: 1.55; }
+    .register-not-cop-link {
+      display: flex; align-items: center; gap: 14px;
+      width: 100%; max-width: 420px; margin: 0 auto;
+      text-align: left; padding: 16px 18px;
+      height: auto; white-space: normal;
+      background: var(--surface); border: 1px solid var(--border-md);
+      border-radius: var(--radius-lg); cursor: pointer;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    .register-not-cop-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+      border-color: var(--border);
+    }
+    .register-not-cop-icon {
+      width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+      background: var(--green-bg); color: var(--green-text);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .register-not-cop-text { flex: 1; min-width: 0; }
+    .register-not-cop-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .register-not-cop-sub { font-size: 12px; color: var(--text-3); line-height: 1.3; }
+    .register-not-cop-arrow { font-size: 18px; color: var(--text-3); flex-shrink: 0; animation: registerNudge 2s ease-in-out infinite; }
+    @keyframes registerNudge { 0%,100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
   </style>
 
 <script>
@@ -2386,14 +2570,17 @@
 
   <!-- Public check-in form -->
   <div class="checkin-card">
-    <div class="checkin-icon-badge"><i class="ti ti-calendar-event"></i></div>
     <h2>Member Check-In</h2>
 
     <div class="checkin-success" id="checkin-success">
-      <i class="ti ti-circle-check" style="font-size:20px;flex-shrink:0"></i>
-      <div>
-        <div style="font-weight:600" id="checkin-success-title">You are checked in</div>
-      </div>
+      <div class="checkin-success-icon"><i class="ti ti-circle-check"></i></div>
+      <div class="checkin-success-title" id="checkin-success-title">You're all set!</div>
+      <div class="checkin-success-sub" id="checkin-success-sub">Your attendance has been recorded. Enjoy the session!</div>
+    </div>
+    <div class="checkin-error-card" id="checkin-error-card">
+      <div class="checkin-error-card-icon"><i class="ti ti-x"></i></div>
+      <div class="checkin-error-card-title">No member found</div>
+      <div class="checkin-error-card-sub">We couldn't match this QR code to anyone. Try scanning again or ask a leader for help.</div>
     </div>
     <div class="checkin-error" id="checkin-error"></div>
 
@@ -2416,7 +2603,94 @@
     </div>
   </div>
 
-  <p class="welcome-divider">Authorized leaders can sign in at the top right.</p>
+  <div id="register-not-cop-wrap" style="margin-top:16px">
+    <button class="register-not-cop-link" onclick="showRegister()">
+      <div class="register-not-cop-icon"><i class="ti ti-user-plus"></i></div>
+      <div class="register-not-cop-text">
+        <div class="register-not-cop-title">Not a COP member?</div>
+        <div class="register-not-cop-sub">Register once and get a personal QR code for all future check-ins.</div>
+      </div>
+      <i class="ti ti-chevron-right register-not-cop-arrow"></i>
+    </button>
+  </div>
+</div>
+
+<!-- ── Non-COP Member Registration ── -->
+<div class="auth-overlay hidden" id="overlay-register">
+  <button class="welcome-leader-btn" onclick="showSignIn()">
+    <i class="ti ti-lock"></i> Leader Sign In
+  </button>
+  <div class="auth-brand" style="margin-bottom:1.25rem">
+    <div class="brand-logo-wrap" id="register-brand-logo-wrap">
+      <img id="register-brand-logo" class="brand-logo-auth" alt="App logo" />
+    </div>
+    <h1 id="register-tracker-title">AI Bootcamp Attendance Tracker</h1>
+    <p>Bootcamp participant self-registration.</p>
+  </div>
+
+  <div class="register-card">
+    <div id="register-card-header">
+      <div class="register-icon-badge"><i class="ti ti-user-plus"></i></div>
+      <h2 style="margin-bottom:4px">Register as Participant</h2>
+      <p style="font-size:13px;color:var(--text-2);margin-bottom:18px;line-height:1.4">
+        Not a COP member? Register once and get a personal QR code for all future check-ins.
+      </p>
+    </div>
+
+    <div class="register-error" id="register-error"></div>
+
+    <!-- Registration form -->
+    <div id="register-form-body">
+      <div class="register-field">
+        <label for="register-name">Full name <span class="required-star" aria-hidden="true">*</span></label>
+        <input type="text" id="register-name" placeholder="Your full name" autocomplete="name" maxlength="80"
+          oninput="updateRegisterButton()"
+          onkeydown="if(event.key==='Enter')submitNonCopRegistration()" />
+      </div>
+      <div class="register-field">
+        <label for="register-phone">Contact number <span class="required-star" aria-hidden="true">*</span></label>
+        <input type="tel" id="register-phone" placeholder="e.g. 09171234567"
+          inputmode="numeric" maxlength="15"
+          oninput="updateRegisterButton()"
+          onkeydown="if(event.key==='Enter')submitNonCopRegistration()" />
+      </div>
+      <button class="primary" id="register-submit-btn"
+        style="width:100%;height:44px;justify-content:center;font-size:15px;margin-top:4px"
+        onclick="submitNonCopRegistration()" disabled>
+        <i class="ti ti-user-check"></i> Register &amp; Get My QR Code
+      </button>
+    </div>
+
+    <!-- Success / QR display -->
+    <div class="register-success-box" id="register-success-box">
+      <div id="register-success-title" style="font-size:18px;font-weight:600;color:var(--green-text);margin-bottom:4px">
+        <i class="ti ti-circle-check"></i> Successfully Registered!
+      </div>
+      <div style="font-size:13px;color:var(--text-2)">Save the QR code below to your phone.</div>
+      <div class="register-qr-wrap">
+        <img id="register-qr-img" src="" alt="Your personal check-in QR code" />
+      </div>
+
+
+      <button class="primary"
+        style="width:100%;height:42px;justify-content:center;font-size:15px;margin-top:16px"
+        onclick="showWelcome()">
+        <i class="ti ti-calendar-check"></i> Go to Check-In
+      </button>
+      <button
+        style="width:100%;height:38px;justify-content:center;font-size:13px;margin-top:8px;color:var(--text-2)"
+        onclick="resetRegisterForm()">
+        <i class="ti ti-user-plus"></i> Register another participant
+      </button>
+    </div>
+
+    <div style="text-align:center;margin-top:16px">
+      <button onclick="showWelcome()"
+        style="color:var(--text-3);font-size:13px;height:auto;min-height:0;padding:4px 8px;background:transparent;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px">
+        <i class="ti ti-arrow-left"></i> Back to Check-In
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- ── Sign In card ── -->
@@ -2468,7 +2742,7 @@
   </button>
 </div>
 
-<div class="layout">
+<div class="layout" id="main-layout" style="display:none">
   <nav class="sidebar">
     <span class="nav-label">Menu</span>
     <button class="nav-btn active" id="nav-members" onclick="switchPage('members')">
@@ -2500,20 +2774,29 @@
       <div class="page-sub">Add members and view the full roster. Only new members are created here.</div>
 
       <div class="sec-label">Add new member</div>
-      <div class="add-row member-add-row">
-        <div class="form-field">
-          <label for="member-input">Full name <span class="required-star" aria-hidden="true">*</span></label>
-          <input type="text" id="member-input" placeholder="Full name" aria-required="true" oninput="updateSmartButtons()" onkeydown="if(event.key==='Enter')addMember()" />
+      <div class="roster-tools-card" style="flex-direction:column;align-items:stretch;margin-bottom:1rem">
+        <div class="add-row member-add-row">
+          <div class="form-field">
+            <label for="member-input">Full name <span class="required-star" aria-hidden="true">*</span></label>
+            <input type="text" id="member-input" placeholder="Full name" aria-required="true" oninput="updateSmartButtons()" onkeydown="if(event.key==='Enter')addMember()" />
+          </div>
+          <div class="form-field">
+            <label for="member-number">Member / Contact No. <span class="required-star" aria-hidden="true">*</span></label>
+            <input type="text" id="member-number" placeholder="Member / Contact No." inputmode="numeric" maxlength="30" aria-required="true" oninput="updateSmartButtons()" onkeydown="if(event.key==='Enter')addMember()" />
+          </div>
+          <div class="form-field">
+            <label for="member-group">Group <span style="font-weight:400;color:var(--text-3)">(optional)</span></label>
+            <select id="member-group"></select>
+          </div>
         </div>
-        <div class="form-field">
-          <label for="member-number">Member number <span class="required-star" aria-hidden="true">*</span></label>
-          <input type="text" id="member-number" placeholder="Member number" inputmode="numeric" maxlength="30" aria-required="true" oninput="updateSmartButtons()" onkeydown="if(event.key==='Enter')addMember()" />
+        <div id="add-member-btn-row" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1.35fr) minmax(0,1.1fr);gap:8px">
+          <div style="grid-column:3">
+            <button class="primary" id="add-member-btn" onclick="addMember()" disabled
+              style="width:100%;justify-content:center">
+              <i class="ti ti-user-plus"></i> Add member
+            </button>
+          </div>
         </div>
-        <div class="form-field">
-          <label for="member-group">Group <span style="font-weight:400;color:var(--text-3)">(optional)</span></label>
-          <select id="member-group"></select>
-        </div>
-        <button class="primary" id="add-member-btn" onclick="addMember()" disabled><i class="ti ti-user-plus"></i> Add member</button>
       </div>
 
       <div class="sec-label">Roster tools</div>
@@ -2534,13 +2817,13 @@
           <div>
             <div class="sec-label" style="margin-bottom:5px">Import members</div>
             <div class="csv-import-title">Upload CSV file</div>
-            <div class="csv-import-sub">Full Name and Member Number required. Group optional.</div>
+            <div class="csv-import-sub">Full Name and Member / Contact No. required. Group optional.</div>
           </div>
           <button class="btn-sm" id="csv-template-btn" onclick="downloadCsvTemplate()"><i class="ti ti-download"></i> Download template</button>
         </div>
 
         <div class="csv-instructions">
-          <div><strong>CSV only.</strong> Full Name and Member Number are required for QR check-in.</div>
+          <div><strong>CSV only.</strong> Full Name and Member / Contact No. are required for QR check-in.</div>
         </div>
 
         <label class="csv-upload-box" id="csv-upload-box" for="csv-file-input">
@@ -2553,14 +2836,33 @@
         <div class="bulk-panel-row" style="margin-top:12px">
           <button class="primary" id="csv-preview-btn" onclick="previewCsvImport()" disabled><i class="ti ti-eye"></i> Preview import</button>
           <button class="primary" id="csv-confirm-btn" onclick="confirmCsvImport()" disabled><i class="ti ti-check"></i> Confirm import</button>
+          <div class="csv-progress-pill" id="csv-progress-pill">
+            <span class="csv-progress-spinner"></span>
+            <span id="csv-progress-text">Importing 0 of 0 members…</span>
+          </div>
           <button id="csv-clear-btn" onclick="resetCsvImportPanel()"><i class="ti ti-refresh"></i> Clear</button>
           <button id="csv-close-btn" onclick="closeCsvImportPanel()">Close</button>
+        </div>
+        <div class="csv-progress-bar-wrap" id="csv-progress-bar-wrap">
+          <div class="csv-progress-bar-fill" id="csv-progress-bar-fill"></div>
+        </div>
+        <div class="csv-progress-stats" id="csv-progress-stats">
+          <span id="csv-progress-added-text">0 added · 0 failed so far</span>
+          <span id="csv-progress-pct-text">0%</span>
         </div>
 
         <div id="csv-preview-wrap" class="csv-preview-wrap"></div>
       </div>
 
-      <div class="sec-label">Roster (<span id="member-count">0</span>)</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px">
+        <div class="sec-label" style="margin-bottom:0">Roster (<span id="member-count">0</span>)</div>
+        <div style="position:relative;flex-shrink:0">
+          <i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--text-3);pointer-events:none"></i>
+          <input type="text" id="roster-search" placeholder="Search name, group, number…"
+            style="height:38px;padding:0 10px 0 32px;border:0.5px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--surface);color:var(--text-1);width:230px;box-sizing:border-box"
+            oninput="filterRoster(this.value)" />
+        </div>
+      </div>
       <div class="member-list" id="member-list"></div>
     </div>
 
@@ -2740,6 +3042,24 @@
           </div>
         </div>
       </div>
+
+      <!-- AI ASSISTANT SETTINGS CARD -->
+      <div class="settings-card">
+        <div class="settings-section-title">AI Assistant</div>
+        <div class="settings-section-copy">Connects the assistant to Google's Gemini API. Generate a key at <a href="https://aistudio.google.com" target="_blank" rel="noopener" style="color:var(--accent)">aistudio.google.com</a> and paste it below.</div>
+        <div class="settings-field">
+          <label for="settings-gemini-key">Gemini API Key</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="password" id="settings-gemini-key" placeholder="AIza…" autocomplete="off" style="flex:1;min-width:0" />
+            <button onclick="toggleGeminiKeyVisibility()" style="width:auto;height:36px;padding:0 10px;font-size:13px;background:var(--surface);border:0.5px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text-2);flex-shrink:0"><i class="ti ti-eye" id="gemini-eye-icon"></i></button>
+          </div>
+          <div class="settings-hint">Stored securely in Supabase. Never exposed in page source.</div>
+        </div>
+        <div class="settings-field" style="display:flex;align-items:center;gap:12px">
+          <button onclick="saveGeminiKey()" style="height:34px;padding:0 16px;background:#1D9E75;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer">Save Key</button>
+          <span id="gemini-key-status" style="font-size:12px;color:var(--text-2)"></span>
+        </div>
+      </div>
     </div>
 
     <!-- CHECK-IN STATUS PAGE -->
@@ -2755,6 +3075,67 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- ── AI Assistant floating button + chat panel ── -->
+<style>
+  .ai-fab{position:fixed;bottom:24px;right:20px;display:flex;align-items:center;gap:8px;background:var(--surface);border:0.5px solid var(--border);border-radius:24px;padding:9px 16px 9px 10px;cursor:pointer;box-shadow:0 2px 14px rgba(0,0,0,.13);opacity:.72;transition:opacity .2s,transform .2s,box-shadow .2s;z-index:900;user-select:none}
+  .ai-fab.hidden{display:none}
+  .ai-fab:hover,.ai-fab.ai-fab-active{opacity:1;box-shadow:0 4px 22px rgba(0,0,0,.18);transform:translateY(-1px)}
+  .ai-fab-icon{width:28px;height:28px;background:#1D9E75;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0}
+  .ai-fab-label{font-size:12.5px;font-weight:500;color:var(--text);white-space:nowrap}
+  .ai-panel{position:fixed;bottom:78px;right:20px;width:340px;max-height:510px;background:var(--surface);border:0.5px solid var(--border);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.15);display:flex;flex-direction:column;z-index:901;overflow:hidden;transform:translateY(14px);opacity:0;transition:transform .25s ease,opacity .25s ease;pointer-events:none}
+  .ai-panel.hidden{display:none}
+  .ai-panel.ai-panel-open{transform:translateY(0);opacity:1;pointer-events:all}
+  .ai-panel-header{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:0.5px solid var(--border);flex-shrink:0;cursor:pointer;transition:background .12s}
+  .ai-panel-header:hover{background:var(--bg)}
+  .ai-panel-title{font-size:13.5px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:7px}
+  .ai-panel-title i{color:#1D9E75;font-size:15px}
+  .ai-panel-collapse-hint{color:var(--text-2);font-size:15px}
+  .ai-panel-messages{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px;min-height:80px}
+  .ai-msg{max-width:86%;padding:8px 11px;border-radius:12px;font-size:12.5px;line-height:1.52;word-break:break-word}
+  .ai-msg-user{align-self:flex-end;background:#1D9E75;color:#fff;border-bottom-right-radius:3px}
+  .ai-msg-bot{align-self:flex-start;background:var(--bg);color:var(--text);border:0.5px solid var(--border);border-bottom-left-radius:3px;white-space:pre-wrap}
+  .ai-msg-loading{display:flex;align-items:center;gap:4px;padding:10px 14px}
+  .ai-msg-loading span{width:6px;height:6px;background:var(--text-3,#ccc);border-radius:50%;animation:ai-bounce 1.1s infinite}
+  .ai-msg-loading span:nth-child(2){animation-delay:.18s}
+  .ai-msg-loading span:nth-child(3){animation-delay:.36s}
+  @keyframes ai-bounce{0%,80%,100%{transform:scale(.65);opacity:.35}40%{transform:scale(1);opacity:1}}
+  .ai-starters{display:none;flex-direction:column;gap:5px;padding:0 12px 8px;flex-shrink:0}
+  .ai-starter-btn{text-align:left;background:var(--bg);border:0.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--text-2);cursor:pointer;transition:background .12s,color .12s;line-height:1.4}
+  .ai-starter-btn:hover{background:var(--border);color:var(--text)}
+  .ai-panel-input-row{display:flex;align-items:center;gap:7px;padding:9px 10px;border-top:0.5px solid var(--border);flex-shrink:0}
+  .ai-panel-input-row input{flex:1;height:33px;font-size:12.5px;border:0.5px solid var(--border);border-radius:8px;padding:0 9px;background:var(--bg);color:var(--text);outline:none}
+  .ai-panel-input-row input:focus{border-color:#1D9E75}
+  .ai-panel-input-row input:disabled{opacity:.55}
+  .ai-panel-input-row button{width:33px;height:33px;border:none;background:#1D9E75;color:#fff;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .ai-panel-input-row button:disabled{background:var(--border);color:var(--text-2);cursor:not-allowed}
+  /* Bottom nav bar (mobile) sits at bottom:10px, height:64px → top edge ≈ 74px from bottom.
+     Fab and panel are pushed above it with clearance, matching the sidebar's own 700px breakpoint. */
+  @media(max-width:700px){
+    .ai-fab{bottom:calc(84px + env(safe-area-inset-bottom));right:10px}
+    .ai-panel{right:10px;left:10px;width:auto;bottom:calc(138px + env(safe-area-inset-bottom));max-height:60vh}
+  }
+</style>
+
+<div id="ai-chat-fab" class="ai-fab hidden" onclick="toggleAIChat()">
+  <div class="ai-fab-icon"><i class="ti ti-sparkles"></i></div>
+  <span class="ai-fab-label">Have questions? Ask AI</span>
+</div>
+
+<div id="ai-chat-panel" class="ai-panel hidden">
+  <div class="ai-panel-header" onclick="toggleAIChat()" title="Click to close">
+    <div class="ai-panel-title"><i class="ti ti-sparkles"></i> AI Assistant</div>
+    <i class="ti ti-chevron-down ai-panel-collapse-hint" aria-hidden="true"></i>
+  </div>
+  <div class="ai-panel-messages" id="ai-messages">
+    <div class="ai-msg ai-msg-bot">Hi! I know this app inside out and can answer questions about your attendance data too. What do you need?</div>
+  </div>
+  <div class="ai-starters" id="ai-starters"></div>
+  <div class="ai-panel-input-row">
+    <input type="text" id="ai-input" placeholder="Ask me anything…" onkeydown="if(event.key==='Enter')sendAIMessage()" />
+    <button id="ai-send-btn" onclick="sendAIMessage()" title="Send"><i class="ti ti-send"></i></button>
+  </div>
+</div>
 
 <div class="dashboard-loading-overlay hidden" id="dashboard-loading-overlay" role="status" aria-live="polite" aria-busy="true">
   <div class="dashboard-loading-card">
@@ -2773,6 +3154,10 @@
   var currentDate = '';
   var trackerStartDate = ''; /* loaded from Supabase app_settings after login */
   var eventEndDate = ''; /* optional current event reference date */
+  var geminiApiKey  = ''; /* loaded from Supabase app_settings after admin login */
+  var aiChatHistory = []; /* in-session Gemini conversation history */
+  var aiCooldownTimerId = null; /* tracked globally so a logout mid-cooldown can cancel it */
+  var aiChatOpen    = false;
   var DEFAULT_TRACKER_NAME = 'AI Bootcamp Attendance Tracker';
   var trackerName = DEFAULT_TRACKER_NAME; /* configurable app/event title */
 
@@ -2826,7 +3211,7 @@
   function applyTrackerName(name) {
     trackerName = cleanTrackerName(name) || DEFAULT_TRACKER_NAME;
     document.title = trackerName;
-    ['welcome-tracker-title', 'signin-tracker-title', 'topbar-tracker-title'].forEach(function(id) {
+    ['welcome-tracker-title', 'signin-tracker-title', 'topbar-tracker-title', 'register-tracker-title'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.textContent = trackerName;
     });
@@ -3096,7 +3481,7 @@
 
   function applyBrandLogo() {
     var current = getCurrentBrandLogo();
-    var logoIds = ['welcome-brand-logo', 'signin-brand-logo', 'settings-logo-preview', 'topbar-brand-logo'];
+    var logoIds = ['welcome-brand-logo', 'signin-brand-logo', 'register-brand-logo', 'settings-logo-preview', 'topbar-brand-logo'];
     logoIds.forEach(function(id) {
       var img = document.getElementById(id);
       if (img) {
@@ -3114,7 +3499,7 @@
         img.alt = current.name || 'App logo';
       }
     });
-    ['welcome-brand-logo-wrap', 'signin-brand-logo-wrap'].forEach(function(id) {
+    ['welcome-brand-logo-wrap', 'signin-brand-logo-wrap', 'register-brand-logo-wrap'].forEach(function(id) {
       var wrap = document.getElementById(id);
       if (wrap) wrap.classList.toggle('hidden', !current || !current.dataUrl);
     });
@@ -3654,7 +4039,7 @@
     return true;
   }
 
-  async function loadSavedBrandLogosFromSupabase(activePath) {
+  async function loadSavedBrandLogosFromSupabase(activePath, skipApply) {
     var client = getSupabaseClient ? getSupabaseClient() : null;
     if (!client) return false;
     try {
@@ -3681,7 +4066,9 @@
         return Object.assign({}, item, { isDefaultChoice: item.id === defaultBrandLogoId });
       });
       persistBrandLogoSettings();
-      applyBrandLogo();
+      /* Only apply immediately when not called from loadActiveBrandLogoFromSupabase,
+         which will reconcile currentBrandLogoId first then call applyBrandLogo itself. */
+      if (!skipApply) applyBrandLogo();
       renderSavedLogos();
       return true;
     } catch(e) {
@@ -3707,7 +4094,7 @@
     try {
       var path = await supabaseSettingsLoad('active_logo_path');
       path = normalizeLogoStoragePath(path);
-      await loadSavedBrandLogosFromSupabase(path);
+      await loadSavedBrandLogosFromSupabase(path, true);
       if (!path) {
         currentBrandLogoId = DEFAULT_BRAND_LOGO_ID;
         persistBrandLogoSettings();
@@ -3958,6 +4345,8 @@
     if (startInp) startInp.value = trackerStartDate || todayISO();
     var endInp = document.getElementById('settings-end-date');
     if (endInp) endInp.value = eventEndDate || '';
+    var geminiInp = document.getElementById('settings-gemini-key');
+    if (geminiInp) geminiInp.value = geminiApiKey || '';
     syncEventDateLimits(false);
     updateResetUi();
     updateSmartButtons();
@@ -4028,7 +4417,10 @@
 
   /* ── Helpers ── */
   function initials(name) {
-    return name.trim().split(/\s+/).map(function(w){ return w[0] || ''; }).join('').toUpperCase().slice(0, 2) || '?';
+    var raw = String(name || '').trim().split(/\s+/).map(function(w){ return w[0] || ''; }).join('').toUpperCase().slice(0, 2) || '?';
+    /* Escaped here so every call site is safe automatically — name ultimately
+       originates from the public, unauthenticated registration form. */
+    return esc(raw);
   }
   function pctClass(p) { return p >= 75 ? 'pct-high' : p >= 50 ? 'pct-mid' : 'pct-low'; }
   function esc(s) {
@@ -4088,27 +4480,15 @@
   /* Returns every valid event date in range, not just dates with saved records.
      Missing records are treated as Absent for percentage/reporting purposes. */
   function validAttendanceWeeks() {
-    var today = todayISO();
-    var start = trackerStartDate && isValidISODate(trackerStartDate) ? trackerStartDate : '';
+    /* Only count dates that have a saved attendance record.
+       This ensures percentages are based on actual sessions held,
+       not every calendar day between start and end date.
+       Works correctly for any schedule: weekly, twice a week,
+       irregular, or daily. */
     var end = reportEndDate();
-
-    if (!start) {
-      var recordedDates = Object.keys(state.records)
-        .filter(function(d) { return isValidISODate(d) && d <= today; })
-        .sort();
-      start = recordedDates.length ? recordedDates[0] : today;
-    }
-    if (start > end) return [];
-
-    var dates = [];
-    var cursor = start;
-    var guard = 0;
-    while (cursor <= end && guard < 3700) {
-      dates.push(cursor);
-      cursor = addDaysISO(cursor, 1);
-      guard++;
-    }
-    return dates;
+    return Object.keys(state.records)
+      .filter(function(d) { return isValidISODate(d) && d <= end; })
+      .sort();
   }
 
   function memberAttendance(name) {
@@ -4658,6 +5038,11 @@
       toast('Import is still running. Please wait until it finishes.');
       return;
     }
+    /* Always reset the CSV import panel on navigation — otherwise it stays
+       open in the background (even through "Start New Event" resets) and
+       reappears stale whenever the admin comes back to Members. */
+    closeCsvImportPanel();
+    window.scrollTo(0, 0);
     ['members','groups','checkins','attendance','history','settings'].forEach(function(p) {
       document.getElementById('page-' + p).classList.toggle('active', p === page);
       document.getElementById('nav-' + p).classList.toggle('active', p === page);
@@ -4687,16 +5072,34 @@
   }
 
   function todayISO() {
-    var now = new Date();
-    var y = now.getFullYear();
-    var mo = String(now.getMonth() + 1).padStart(2, '0');
-    var dd = String(now.getDate()).padStart(2, '0');
-    return y + '-' + mo + '-' + dd;
+    /* Always computed in Philippine time (Asia/Manila), regardless of the
+       device/browser's own system timezone setting — this app is PH-based. */
+    var parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Manila',
+      year: 'numeric', month: '2-digit', day: '2-digit'
+    }).formatToParts(new Date());
+    var map = {};
+    parts.forEach(function(p) { map[p.type] = p.value; });
+    return map.year + '-' + map.month + '-' + map.day;
+  }
+
+  /* Converts an ISO date (YYYY-MM-DD) into readable word form, e.g. "June 19, 2026".
+     Anchored to Philippine midnight so the day never shifts regardless of timezone. */
+  function isoToWords(iso) {
+    if (!iso) return '';
+    var d = new Date(iso + 'T00:00:00+08:00');
+    return new Intl.DateTimeFormat('en-PH', {
+      timeZone: 'Asia/Manila',
+      year: 'numeric', month: 'long', day: 'numeric'
+    }).format(d);
   }
 
   /* ── Members ── */
   function renderMembers() {
     renderGroupUI(); /* rebuild dropdown */
+    /* clear search so freshly rendered list isn't filtered unexpectedly */
+    var searchEl = document.getElementById('roster-search');
+    if (searchEl) searchEl.value = '';
     var list = document.getElementById('member-list');
     document.getElementById('member-count').textContent = state.members.length;
     if (!state.members.length) {
@@ -4713,7 +5116,7 @@
         var att = memberAttendance(m.name);
         var stats = att.total ? (att.attended + ' of ' + att.total + ' event dates') : 'No event dates yet';
         var memberNo = cleanMemberNumber(m.memberNumber || m.member_number || '');
-        var memberNoText = memberNo ? 'Member No. ' + memberNo : 'No member number yet';
+        var memberNoText = memberNo ? 'Member / Contact No. ' + memberNo : 'No member / contact no. yet';
         var badge = att.total ? ('<span class="pct-badge ' + pctClass(att.pct) + '">' + att.pct + '%</span>') : '';
         var safeName = esc(m.name);
         var safeMemberNo = esc(memberNo);
@@ -4744,7 +5147,7 @@
           /* inline edit row — hidden until pencil clicked */
           '<div class="member-edit-row" id="' + editRowId + '" data-origname="' + safeName + '">' +
             '<input type="text" class="medit-name" value="' + safeName + '" placeholder="Member name" />' +
-            '<input type="text" class="medit-number" value="' + safeMemberNo + '" placeholder="Member number" inputmode="numeric" maxlength="30" />' +
+            '<input type="text" class="medit-number" value="' + safeMemberNo + '" placeholder="Member / Contact No." inputmode="numeric" maxlength="30" />' +
             '<select class="medit-group">' + groupOpts + '</select>' +
             '<button class="btn-sm primary" data-action="save-member-edit" data-editid="' + editRowId + '"><i class="ti ti-check"></i> Save</button>' +
             '<button class="btn-sm" data-action="cancel-member-edit" data-editid="' + editRowId + '">Cancel</button>' +
@@ -4765,11 +5168,11 @@
     var memberNumber = cleanMemberNumber(numInp ? numInp.value : '');
     var group = sel ? sel.value : 'Unassigned';
     if (!name) { toast('Please enter a name.'); inp.focus(); return; }
-    if (!memberNumber) { toast('Please enter a member number for QR check-in.'); if (numInp) numInp.focus(); return; }
+    if (!memberNumber) { toast('Please enter a member / contact no. for QR check-in.'); if (numInp) numInp.focus(); return; }
     var nameKey = normalizeMemberNameKey(name);
     var exists = state.members.some(function(m) { return normalizeMemberNameKey(m.name) === nameKey; });
     if (exists) { toast('That member already exists.'); inp.focus(); return; }
-    if (memberNumber && memberNumberExists(memberNumber)) { toast('That member number is already assigned.'); if (numInp) numInp.focus(); return; }
+    if (memberNumber && memberNumberExists(memberNumber)) { toast('That member / contact no. is already assigned.'); if (numInp) numInp.focus(); return; }
 
     if (addBtn) { addBtn.disabled = true; addBtn.innerHTML = '<i class="ti ti-loader"></i> Adding…'; }
 
@@ -4840,6 +5243,7 @@
 
   /* ── CSV Import: template, upload, preview, confirm ── */
   var csvImportState = { fileName: '', rawText: '', rows: [], summary: null };
+  var _csvEditingIdx = null; /* tracks which row is currently open for editing */
   var csvImportIsImporting = false;
 
   function setCsvImporting(isImporting) {
@@ -4876,9 +5280,19 @@
     if (uploadLabel && csvImportIsImporting) uploadLabel.textContent = 'Importing members…';
 
     if (csvImportIsImporting) {
-      if (confirmBtn) confirmBtn.innerHTML = '<i class="ti ti-loader"></i> Importing…';
+      if (confirmBtn) confirmBtn.style.display = 'none';
+      var pill = document.getElementById('csv-progress-pill');
+      if (pill) pill.classList.add('visible');
     } else {
-      if (confirmBtn) confirmBtn.innerHTML = '<i class="ti ti-check"></i> Confirm import';
+      if (confirmBtn) confirmBtn.style.display = '';
+      var pill = document.getElementById('csv-progress-pill');
+      if (pill) pill.classList.remove('visible');
+      var barWrap = document.getElementById('csv-progress-bar-wrap');
+      if (barWrap) barWrap.classList.remove('visible');
+      var stats = document.getElementById('csv-progress-stats');
+      if (stats) stats.classList.remove('visible');
+      var barFill = document.getElementById('csv-progress-bar-fill');
+      if (barFill) barFill.style.width = '0%';
       if (uploadLabel) uploadLabel.textContent = csvImportState.fileName || 'Choose CSV file';
       updateCsvImportButtons();
       updateSmartButtons();
@@ -4936,9 +5350,9 @@
     }
 
     var rows = rosterExportRows();
-    var lines = [csvLine(['Full Name', 'Member Number', 'Group'])];
+    var lines = [csvLine(['Full Name', 'Member / Contact No.', 'Group'])];
     rows.forEach(function(row) {
-      lines.push(csvLine([row.name, row.memberNumber || '', row.group || 'Unassigned']));
+      lines.push(csvLine([row.name, csvForceText(row.memberNumber || ''), row.group || 'Unassigned']));
     });
 
     var csv = lines.join('\n');
@@ -4958,7 +5372,7 @@
   function downloadCsvTemplate() {
     if (csvImportIsImporting) { toast('Import is still running. Please wait until it finishes.'); return; }
     var csv = [
-      csvLine(['Full Name', 'Member Number', 'Group']),
+      csvLine(['Full Name', 'Member / Contact No.', 'Group']),
       csvLine(['Juan Dela Cruz', '252022', 'Group A']),
       csvLine(['Maria Santos', '252023', 'Group A']),
       csvLine(['Pedro Reyes', '252024', 'Unassigned'])
@@ -4983,7 +5397,7 @@
     var confirmBtn = document.getElementById('csv-confirm-btn');
     var previewWrap = document.getElementById('csv-preview-wrap');
 
-    csvImportState = { fileName: '', rawText: '', rows: [], summary: null };
+    csvImportState = { fileName: '', rawText: '', rows: [], summary: null }; _csvEditingIdx = null;
     if (previewWrap) previewWrap.innerHTML = '';
     if (previewBtn) previewBtn.disabled = true;
     if (confirmBtn) confirmBtn.disabled = true;
@@ -5055,7 +5469,7 @@
   function csvHeaderRole(value) {
     var h = normalizeCsvHeaderCell(value);
     if (h === 'full name' || h === 'name' || h === 'member name') return 'name';
-    if (h === 'member number' || h === 'member no' || h === 'member no.' || h === 'cop member number' || h === 'number' || h === 'phone') return 'memberNumber';
+    if (h === 'member number' || h === 'member no' || h === 'member no.' || h === 'cop member number' || h === 'number' || h === 'phone' || h === 'contact number' || h === 'contact_number' || h === 'contact no' || h === 'contact no.' || h === 'member / contact no.' || h === 'member / contact no' || h === 'member_contact_no') return 'memberNumber';
     if (h === 'group' || h === 'group name' || h === 'team') return 'group';
     return '';
   }
@@ -5101,90 +5515,252 @@
 
     var existingKeys = state.members.map(function(m){ return normalizeMemberNameKey(m.name); });
     var existingMemberNumbers = state.members.map(function(m){ return cleanMemberNumber(m.memberNumber || m.member_number || '').toLowerCase(); }).filter(Boolean);
-    var seenInFile = [];
-    var seenNumbersInFile = [];
     var rows = [];
-    var validCount = 0, duplicateCount = 0, issueCount = 0;
-    var newGroupsMap = {};
 
     dataRows.forEach(function(row, idx) {
       var cells = row.cells || [];
-      var fullName = (cells[headerMap.name] || '').trim();
+      var fullName     = (cells[headerMap.name] || '').trim();
       var memberNumber = headerMap.memberNumber >= 0 ? cleanMemberNumber(cells[headerMap.memberNumber] || '') : '';
-      var rawGroup = (cells[headerMap.group] || '').trim();
-      var group = canonicalCsvGroupName(rawGroup);
-      var rowNo = row.rowNo || (idx + 1);
-      var status = 'Ready';
-      var statusClass = 'csv-status-ok';
-      var importable = false;
-      var nameKey = normalizeMemberNameKey(fullName);
-      var numberKey = cleanMemberNumber(memberNumber).toLowerCase();
-
-      if (!fullName) {
-        status = 'Missing name';
-        statusClass = 'csv-status-error';
-        issueCount++;
-      } else if (!numberKey) {
-        status = 'Missing member number';
-        statusClass = 'csv-status-error';
-        issueCount++;
-      } else if (existingKeys.indexOf(nameKey) !== -1) {
-        status = 'Duplicate roster name';
-        statusClass = 'csv-status-warn';
-        duplicateCount++;
-      } else if (seenInFile.indexOf(nameKey) !== -1) {
-        status = 'Duplicate name in file';
-        statusClass = 'csv-status-warn';
-        duplicateCount++;
-      } else if (numberKey && existingMemberNumbers.indexOf(numberKey) !== -1) {
-        status = 'Duplicate member number';
-        statusClass = 'csv-status-warn';
-        duplicateCount++;
-      } else if (numberKey && seenNumbersInFile.indexOf(numberKey) !== -1) {
-        status = 'Duplicate number in file';
-        statusClass = 'csv-status-warn';
-        duplicateCount++;
-      } else {
-        importable = true;
-        validCount++;
-        seenInFile.push(nameKey);
-        if (numberKey) seenNumbersInFile.push(numberKey);
-        if (group !== 'Unassigned' && state.groups.indexOf(group) === -1) newGroupsMap[group.toLowerCase()] = true;
-      }
-
-      rows.push({ rowNo: rowNo, fullName: fullName, memberNumber: memberNumber, group: group, status: status, statusClass: statusClass, importable: importable });
+      var rawGroup     = (cells[headerMap.group] || '').trim();
+      var group        = canonicalCsvGroupName(rawGroup);
+      var rowNo        = row.rowNo || (idx + 1);
+      /* Status will be assigned by revalidateCsvRows() below */
+      rows.push({ rowNo: rowNo, fullName: fullName, memberNumber: memberNumber, group: group, status: 'Ready', statusClass: 'csv-status-ok', importable: false });
     });
 
-    var newGroupCount = Object.keys(newGroupsMap).length;
     csvImportState.rows = rows;
-    csvImportState.summary = { total: rows.length, ready: validCount, duplicates: duplicateCount, issues: issueCount, newGroups: newGroupCount };
+    /* Use the shared revalidation function so status messages are always consistent */
+    revalidateCsvRows();
+    renderCsvPreviewTable();
+  }
+
+  /* ── CSV Import — re-validate all rows ──
+     Two-pass approach:
+     Pass 1: build frequency maps of all names/numbers in the file.
+     Pass 2: assign status. When a conflict exists between two rows,
+             the edited row (editedIdx) takes the blame — pre-existing
+             Ready rows are never downgraded because of someone else's edit. */
+  function revalidateCsvRows(editedIdx) {
+    var rows = csvImportState.rows;
+    var existingKeys = state.members.map(function(m){ return normalizeMemberNameKey(m.name); });
+    var existingNums = state.members.map(function(m){ return cleanMemberNumber(m.memberNumber || m.member_number || '').toLowerCase(); }).filter(Boolean);
+
+    /* ── Pass 1: map each name/number → all rowNos that share it ── */
+    var nameRows = {}, numRows = {};
+    rows.forEach(function(r) {
+      var nk = normalizeMemberNameKey(r.fullName);
+      var uk = cleanMemberNumber(r.memberNumber).toLowerCase();
+      if (nk) { if (!nameRows[nk]) nameRows[nk] = []; nameRows[nk].push(r.rowNo); }
+      if (uk) { if (!numRows[uk])  numRows[uk]  = []; numRows[uk].push(r.rowNo);  }
+    });
+
+    function conflictRef(allRowNos, currentRowNo) {
+      var others = allRowNos.filter(function(n){ return n !== currentRowNo; });
+      if (!others.length) return '';
+      return others.length === 1 ? 'Row ' + others[0] : 'Rows ' + others.join(' & ');
+    }
+
+    /* ── Pass 2: assign status to each row ── */
+    var validCount = 0, duplicateCount = 0, issueCount = 0;
+    var newGroupsMap = {};
+
+    rows.forEach(function(r, idx) {
+      var nameKey  = normalizeMemberNameKey(r.fullName);
+      var numberKey = cleanMemberNumber(r.memberNumber).toLowerCase();
+
+      /* Hard errors — missing required fields */
+      if (!r.fullName) {
+        r.status = 'Missing name'; r.statusClass = 'csv-status-error'; r.importable = false; issueCount++;
+        return;
+      }
+      if (!numberKey) {
+        r.status = 'Missing number'; r.statusClass = 'csv-status-error'; r.importable = false; issueCount++;
+        return;
+      }
+
+      /* Conflict with existing DB members */
+      if (existingKeys.indexOf(nameKey) !== -1) {
+        r.status = 'Duplicate name — already in roster'; r.statusClass = 'csv-status-warn'; r.importable = false; duplicateCount++;
+        return;
+      }
+      if (numberKey && existingNums.indexOf(numberKey) !== -1) {
+        r.status = 'Duplicate number — already in roster'; r.statusClass = 'csv-status-warn'; r.importable = false; duplicateCount++;
+        return;
+      }
+
+      /* In-file duplicate name */
+      if (nameRows[nameKey] && nameRows[nameKey].length > 1) {
+        if (editedIdx !== undefined && idx !== editedIdx && r.importable === true) {
+          r.status = 'Ready'; r.statusClass = 'csv-status-ok'; r.importable = true;
+          validCount++;
+          if (r.group !== 'Unassigned' && state.groups.indexOf(r.group) === -1) newGroupsMap[r.group.toLowerCase()] = true;
+        } else {
+          var ref = conflictRef(nameRows[nameKey], r.rowNo);
+          r.status = 'Duplicate name' + (ref ? ' — same as ' + ref : ' in file');
+          r.statusClass = 'csv-status-warn'; r.importable = false; duplicateCount++;
+        }
+        return;
+      }
+
+      /* In-file duplicate number */
+      if (numberKey && numRows[numberKey] && numRows[numberKey].length > 1) {
+        if (editedIdx !== undefined && idx !== editedIdx && r.importable === true) {
+          r.status = 'Ready'; r.statusClass = 'csv-status-ok'; r.importable = true;
+          validCount++;
+          if (r.group !== 'Unassigned' && state.groups.indexOf(r.group) === -1) newGroupsMap[r.group.toLowerCase()] = true;
+        } else {
+          var ref = conflictRef(numRows[numberKey], r.rowNo);
+          r.status = 'Duplicate number' + (ref ? ' — same as ' + ref : ' in file');
+          r.statusClass = 'csv-status-warn'; r.importable = false; duplicateCount++;
+        }
+        return;
+      }
+
+      /* All clear — Ready */
+      r.status = 'Ready'; r.statusClass = 'csv-status-ok'; r.importable = true;
+      validCount++;
+      if (r.group !== 'Unassigned' && state.groups.indexOf(r.group) === -1) newGroupsMap[r.group.toLowerCase()] = true;
+    });
+
+    csvImportState.summary = {
+      total: rows.length, ready: validCount,
+      duplicates: duplicateCount, issues: issueCount,
+      newGroups: Object.keys(newGroupsMap).length
+    };
     updateCsvImportButtons();
+  }
 
-    var summaryHtml = '<div class="csv-summary-grid">' +
-      '<div class="csv-summary-card"><div class="label">Rows</div><div class="value">' + rows.length + '</div></div>' +
-      '<div class="csv-summary-card"><div class="label">Ready</div><div class="value">' + validCount + '</div></div>' +
-      '<div class="csv-summary-card"><div class="label">Duplicates</div><div class="value">' + duplicateCount + '</div></div>' +
-      '<div class="csv-summary-card"><div class="label">New groups</div><div class="value">' + newGroupCount + '</div></div>' +
-    '</div>';
+  /* ── CSV Import — render the preview table (reusable after edit/delete) ── */
+  function renderCsvPreviewTable() {
+    var previewWrap = document.getElementById('csv-preview-wrap');
+    if (!previewWrap) return;
+    var rows = csvImportState.rows;
+    var s = csvImportState.summary || {};
 
-    var tableRows = rows.slice(0, 25).map(function(r) {
-      return '<tr>' +
+    var summaryHtml =
+      '<div class="csv-summary-grid">' +
+        '<div class="csv-summary-card"><div class="label">Rows</div><div class="value">' + rows.length + '</div></div>' +
+        '<div class="csv-summary-card"><div class="label">Ready</div><div class="value">' + (s.ready||0) + '</div></div>' +
+        '<div class="csv-summary-card"><div class="label">Duplicates</div><div class="value">' + (s.duplicates||0) + '</div></div>' +
+        '<div class="csv-summary-card"><div class="label">New groups</div><div class="value">' + (s.newGroups||0) + '</div></div>' +
+      '</div>';
+
+    var tableRows = rows.slice(0, 25).map(function(r, idx) {
+      var actions = !r.importable
+        ? '<div style="display:flex;gap:4px">' +
+            '<button onclick="editCsvRow(' + idx + ')" title="Edit row" style="width:26px;height:26px;border:0.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:var(--text-2)"><i class="ti ti-pencil"></i></button>' +
+            '<button onclick="deleteCsvRow(' + idx + ')" title="Delete row" style="width:26px;height:26px;border:0.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:var(--red-text)"><i class="ti ti-trash"></i></button>' +
+          '</div>'
+        : '';
+      return '<tr id="csv-row-' + idx + '">' +
         '<td>' + r.rowNo + '</td>' +
         '<td>' + esc(r.fullName || '—') + '</td>' +
         '<td>' + esc(r.memberNumber || '—') + '</td>' +
         '<td>' + esc(r.group || 'Unassigned') + '</td>' +
         '<td class="' + r.statusClass + '">' + esc(r.status) + '</td>' +
+        '<td style="white-space:nowrap">' + actions + '</td>' +
       '</tr>';
     }).join('');
 
-    var moreNote = rows.length > 25 ? '<div class="csv-phase-note">Showing first 25 rows only.</div>' : '';
+    var moreNote = rows.length > 25 ? '<div class="csv-phase-note">Showing first 25 rows only. Edit or delete rows below that are not visible here.</div>' : '';
     var phaseNote = '<div class="csv-phase-note"><strong>Review before saving:</strong> Only rows marked Ready will be imported.</div>';
 
     previewWrap.innerHTML = summaryHtml +
       '<div class="csv-table-wrap"><table class="csv-preview-table">' +
-        '<thead><tr><th>Row</th><th>Full Name</th><th>Member Number</th><th>Group</th><th>Status</th></tr></thead>' +
+        '<thead><tr><th>Row</th><th>Full Name</th><th>Member / Contact No.</th><th>Group</th><th>Status</th><th></th></tr></thead>' +
         '<tbody>' + tableRows + '</tbody>' +
       '</table></div>' + moreNote + phaseNote;
+  }
+
+  /* ── CSV Import — delete a flagged row ── */
+  function deleteCsvRow(idx) {
+    var row = csvImportState.rows[idx];
+    var label = (row && row.fullName) ? '"' + row.fullName + '"' : 'this row';
+    if (!confirm('Delete ' + label + '?\n\nThis only removes it from the import preview — nothing has been saved yet.')) return;
+    csvImportState.rows.splice(idx, 1);
+    revalidateCsvRows();
+    renderCsvPreviewTable();
+  }
+
+  /* ── CSV Import — revert a single row back to its display state (no save) ── */
+  function _revertCsvRow(idx) {
+    var r = csvImportState.rows[idx];
+    if (!r) return;
+    var tr = document.getElementById('csv-row-' + idx);
+    if (!tr) return;
+    var actions = !r.importable
+      ? '<div style="display:flex;gap:4px">' +
+          '<button onclick="editCsvRow(' + idx + ')" title="Edit row" style="width:26px;height:26px;border:0.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:var(--text-2)"><i class=\'ti ti-pencil\'></i></button>' +
+          '<button onclick="deleteCsvRow(' + idx + ')" title="Delete row" style="width:26px;height:26px;border:0.5px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:var(--red-text)"><i class=\'ti ti-trash\'></i></button>' +
+        '</div>'
+      : '';
+    tr.innerHTML =
+      '<td>' + r.rowNo + '</td>' +
+      '<td>' + esc(r.fullName || '—') + '</td>' +
+      '<td>' + esc(r.memberNumber || '—') + '</td>' +
+      '<td>' + esc(r.group || 'Unassigned') + '</td>' +
+      '<td class="' + r.statusClass + '">' + esc(r.status) + '</td>' +
+      '<td style="white-space:nowrap">' + actions + '</td>';
+  }
+
+  /* ── CSV Import — cancel editing the current row (revert, no save) ── */
+  function cancelCsvRowEdit(idx) {
+    _revertCsvRow(idx);
+    _csvEditingIdx = null;
+  }
+
+  /* ── CSV Import — put a flagged row into edit mode ── */
+  function editCsvRow(idx) {
+    var row = csvImportState.rows[idx];
+    if (!row) return;
+    var tr = document.getElementById('csv-row-' + idx);
+    if (!tr) return;
+    /* Revert any previously open edit row without saving */
+    if (_csvEditingIdx !== null && _csvEditingIdx !== idx) {
+      _revertCsvRow(_csvEditingIdx);
+    }
+    _csvEditingIdx = idx;
+    var inputStyle = 'height:28px;font-size:12px;padding:0 6px;width:100%;min-width:70px;box-sizing:border-box';
+    tr.innerHTML =
+      '<td>' + row.rowNo + '</td>' +
+      '<td><input id="csv-e-name-' + idx + '" type="text" value="' + esc(row.fullName) + '" style="' + inputStyle + '" /></td>' +
+      '<td><input id="csv-e-num-' + idx + '"  type="text" value="' + esc(row.memberNumber) + '" style="' + inputStyle + '" /></td>' +
+      '<td><input id="csv-e-grp-' + idx + '"  type="text" value="' + esc(row.group) + '" style="' + inputStyle + '" /></td>' +
+      '<td colspan="2">' +
+        '<div style="display:flex;gap:4px">' +
+          '<button onclick="saveCsvRowEdit(' + idx + ')" style="height:28px;padding:0 10px;font-size:12px;font-weight:500;background:#1D9E75;color:#fff;border:none;border-radius:6px;cursor:pointer">Save</button>' +
+          '<button onclick="cancelCsvRowEdit(' + idx + ')" style="height:28px;padding:0 10px;font-size:12px;background:var(--surface);border:0.5px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text-2)">Cancel</button>' +
+        '</div>' +
+      '</td>';
+    /* Focus whichever field actually triggered the flag — "name" issues focus
+       the Full Name input, "number" issues focus the Member/Contact No. input.
+       Falls back to name for anything else (e.g. manually opened, no issue). */
+    var statusLower = String(row.status || '').toLowerCase();
+    var targetId = statusLower.indexOf('number') !== -1
+      ? 'csv-e-num-' + idx
+      : 'csv-e-name-' + idx;
+    var targetInput = document.getElementById(targetId);
+    if (targetInput) {
+      targetInput.focus();
+      var len = targetInput.value.length;
+      targetInput.setSelectionRange(len, len);
+    }
+  }
+
+  /* ── CSV Import — save edited row and re-validate all ── */
+  function saveCsvRowEdit(idx) {
+    var row = csvImportState.rows[idx];
+    if (!row) return;
+    var nameEl = document.getElementById('csv-e-name-' + idx);
+    var numEl  = document.getElementById('csv-e-num-'  + idx);
+    var grpEl  = document.getElementById('csv-e-grp-'  + idx);
+    row.fullName     = ((nameEl ? nameEl.value : row.fullName) || '').trim();
+    row.memberNumber = cleanMemberNumber(numEl ? numEl.value : row.memberNumber);
+    row.group        = canonicalCsvGroupName((grpEl ? grpEl.value : row.group) || '');
+    _csvEditingIdx = null;
+    /* Pass editedIdx so pre-existing Ready rows are protected from blame */
+    revalidateCsvRows(idx);
+    renderCsvPreviewTable();
   }
 
   async function supabaseEnsureGroup(name) {
@@ -5224,6 +5800,22 @@
     }
     if (res.error) throw new Error(res.error.message);
     return res.data;
+  }
+
+  function updateCsvProgress(current, total, added, failed) {
+    var pct = total > 0 ? Math.round((current / total) * 100) : 0;
+    var textEl   = document.getElementById('csv-progress-text');
+    var barFill  = document.getElementById('csv-progress-bar-fill');
+    var barWrap  = document.getElementById('csv-progress-bar-wrap');
+    var stats    = document.getElementById('csv-progress-stats');
+    var addedEl  = document.getElementById('csv-progress-added-text');
+    var pctEl    = document.getElementById('csv-progress-pct-text');
+    if (textEl)  textEl.textContent  = 'Importing ' + current + ' of ' + total + ' member' + (total !== 1 ? 's' : '') + '…';
+    if (barFill) barFill.style.width = pct + '%';
+    if (barWrap) barWrap.classList.add('visible');
+    if (stats)   stats.classList.add('visible');
+    if (addedEl) addedEl.textContent = added + ' added' + (failed ? ' · ' + failed + ' failed' : '') + ' so far';
+    if (pctEl)   pctEl.textContent   = pct + '%';
   }
 
   async function confirmCsvImport() {
@@ -5275,6 +5867,7 @@
         failed++;
         console.warn('[CSV Import] Failed row ' + row.rowNo + ' (' + row.fullName + '):', err.message);
       }
+      updateCsvProgress(i + 1, readyRows.length, added, failed);
     }
 
     saveState();
@@ -5302,7 +5895,7 @@
       toast('Import is still running. Please wait until it finishes.');
       return;
     }
-    csvImportState = { fileName: '', rawText: '', rows: [], summary: null };
+    csvImportState = { fileName: '', rawText: '', rows: [], summary: null }; _csvEditingIdx = null;
     var input = document.getElementById('csv-file-input');
     var label = document.getElementById('csv-upload-label');
     var previewBtn = document.getElementById('csv-preview-btn');
@@ -5788,6 +6381,7 @@
     setDashboardLoading(false);
     document.getElementById('overlay-welcome').classList.remove('hidden');
     document.getElementById('overlay-signin').classList.add('hidden');
+    document.getElementById('overlay-register').classList.add('hidden');
     var errEl = document.getElementById('signin-error');
     if (errEl) { errEl.classList.remove('visible'); errEl.textContent = ''; }
     document.getElementById('signin-email').value = '';
@@ -5799,14 +6393,19 @@
     /* Reset check-in form */
     clearTimeout(_ciResetTimer);
     resetCheckInForm();
-    /* Show leader sign-in button */
-    var lb = document.querySelector('.welcome-leader-btn');
-    if (lb) lb.style.display = '';
+    /* Show leader sign-in button(s) — reset every instance (welcome page AND register page) */
+    document.querySelectorAll('.welcome-leader-btn').forEach(function(lb) { lb.style.display = ''; });
+    /* Re-open QR scanner if it was running before navigating away */
+    if (_qrWasRunning) {
+      _qrWasRunning = false;
+      setTimeout(function() { startQrScanner(); }, 350);
+    }
   }
   function showSignIn() {
     /* Privacy: fully release camera before leaving the public check-in screen. */
     stopQrScanner(false);
     document.getElementById('overlay-welcome').classList.add('hidden');
+    document.getElementById('overlay-register').classList.add('hidden');
     document.getElementById('overlay-signin').classList.remove('hidden');
     setTimeout(function(){ document.getElementById('signin-email').focus(); }, 80);
   }
@@ -5816,13 +6415,16 @@
     setDashboardLoading(true, 'Loading dashboard…');
     document.getElementById('overlay-welcome').classList.add('hidden');
     document.getElementById('overlay-signin').classList.add('hidden');
+    document.getElementById('overlay-register').classList.add('hidden');
+    document.getElementById('main-layout').style.display = '';
     document.getElementById('logout-btn').classList.add('visible');
-    var lb = document.querySelector('.welcome-leader-btn');
-    if (lb) lb.style.display = 'none';
+    document.querySelectorAll('.welcome-leader-btn').forEach(function(lb) { lb.style.display = 'none'; });
 
     try {
       /* Load fresh data from Supabase before the admin can navigate. */
       await loadFromSupabase();
+      await loadGeminiKey();
+      showAIFab();
       applyDateConstraints();
       refreshCheckinsBadge();
       switchPage('members', true);
@@ -5832,7 +6434,23 @@
   }
   function hideDashboard() {
     setDashboardLoading(false);
+    document.getElementById('main-layout').style.display = 'none';
     document.getElementById('logout-btn').classList.remove('visible');
+    hideAIFab();
+    aiChatHistory = [];
+    if (aiCooldownTimerId) { clearInterval(aiCooldownTimerId); aiCooldownTimerId = null; }
+    /* Privacy: fully reset the chat panel so the next admin signing in on this
+       same device/browser never sees a previous admin's questions or answers. */
+    var msgsEl = document.getElementById('ai-messages');
+    if (msgsEl) {
+      msgsEl.innerHTML = '<div class="ai-msg ai-msg-bot">Hi! I know this app inside out and can answer questions about your attendance data too. What do you need?</div>';
+    }
+    var startersEl = document.getElementById('ai-starters');
+    if (startersEl) { startersEl.innerHTML = ''; startersEl.style.display = 'none'; }
+    var aiInputEl = document.getElementById('ai-input');
+    if (aiInputEl) { aiInputEl.value = ''; aiInputEl.disabled = false; aiInputEl.placeholder = 'Ask me anything…'; }
+    var aiSendBtn = document.getElementById('ai-send-btn');
+    if (aiSendBtn) aiSendBtn.disabled = false;
   }
   function togglePwVisibility() {
     var pw   = document.getElementById('signin-password');
@@ -6162,7 +6780,7 @@
     var origName = row.getAttribute('data-origname');
 
     if (!newName) { toast('Name cannot be blank.'); nameInp.focus(); return; }
-    if (!newMemberNumber) { toast('Member number is required for QR check-in.'); if (numberInp) numberInp.focus(); return; }
+    if (!newMemberNumber) { toast('Member / Contact No. is required for QR check-in.'); if (numberInp) numberInp.focus(); return; }
     var newNameKey = normalizeMemberNameKey(newName);
     var origNameKey = normalizeMemberNameKey(origName);
     if (newNameKey !== origNameKey) {
@@ -6172,7 +6790,7 @@
       if (dup) { toast('"' + newName + '" already exists.'); nameInp.focus(); return; }
     }
     if (newMemberNumber && memberNumberExists(newMemberNumber, origName)) {
-      toast('That member number is already assigned.');
+      toast('That member / contact no. is already assigned.');
       if (numberInp) numberInp.focus();
       return;
     }
@@ -6387,11 +7005,26 @@
   /* ── Archive export ── */
   function csvCell(value) {
     var s = value === null || value === undefined ? '' : String(value);
+    /* Neutralize CSV/formula injection: a leading =, +, -, @, tab, or CR can be
+       interpreted as a live formula by Excel/Sheets when the exported file is
+       opened. Prefixing with an apostrophe forces it to render as plain text
+       (Excel hides the apostrophe itself — nothing visibly changes for normal
+       values that don't start with these characters). */
+    if (/^[=+\-@\t\r]/.test(s)) { s = "'" + s; }
     return '"' + s.replace(/"/g, '""') + '"';
+  }
+  /* Outputs a spreadsheet formula cell that forces text — preserves leading zeros.
+     ="09123456789" displays as 09123456789 (text) in both Excel and Apple Numbers.
+     On re-import, cleanMemberNumber strips = and " leaving the raw digits intact. */
+  function csvForceText(value) {
+    var s = value === null || value === undefined ? '' : String(value);
+    return { __raw: '="' + s.replace(/"/g, '') + '"' };
   }
 
   function csvLine(values) {
-    return values.map(csvCell).join(',');
+    return values.map(function(v) {
+      return (v && typeof v === 'object' && v.__raw !== undefined) ? v.__raw : csvCell(v);
+    }).join(',');
   }
 
   function addCsvSection(lines, title, headers, rows) {
@@ -6474,7 +7107,7 @@
       var total = dates.length;
       var absent = total - present;
       var pct = total ? Math.round((present / total) * 100) + '%' : '—';
-      return [m.group || 'Unassigned', m.name, cleanMemberNumber(m.memberNumber || m.member_number || ''), present, absent, total, pct];
+      return [m.group || 'Unassigned', m.name, csvForceText(cleanMemberNumber(m.memberNumber || m.member_number || '')), present, absent, total, pct];
     });
   }
 
@@ -6539,13 +7172,14 @@
       var lines = [];
 
       var eventName = trackerName || DEFAULT_TRACKER_NAME;
-      var eventRange = (trackerStartDate || 'Not set') + ' to ' + (eventEndDate || 'No end date set');
+      var eventEndDisplay = eventEndDate || 'Ongoing (no end date set)';
+      var eventRange = (trackerStartDate || 'Not set') + ' to ' + eventEndDisplay;
 
       addCsvSection(lines, 'Archive Summary', ['Field', 'Value'], [
         ['Exported At', archivePhTimestampForDisplay(exportDate)],
         ['Event Name', eventName],
-        ['Event Start Date', trackerStartDate || ''],
-        ['Event End Date', eventEndDate || ''],
+        ['Event Start Date', trackerStartDate || 'Not set'],
+        ['Event End Date', eventEndDisplay],
         ['Event Date Range', eventRange],
         ['Total Members', state.members.length],
         ['Total Groups', groups.length],
@@ -6557,7 +7191,7 @@
         archiveGroupSummaryRows()
       );
 
-      addCsvSection(lines, 'Member Summary', ['Group', 'Full Name', 'Member Number', 'Present', 'Absent', 'Total Dates', 'Attendance %'],
+      addCsvSection(lines, 'Member Summary', ['Group', 'Full Name', 'Member / Contact No.', 'Present', 'Absent', 'Total Dates', 'Attendance %'],
         archiveMemberSummaryRows()
       );
 
@@ -6566,7 +7200,7 @@
       );
 
       var csv = lines.join('\n');
-      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       var stamp = archivePhTimestampForFile(exportDate);
@@ -6664,6 +7298,7 @@
     var nameFallback = document.getElementById('name-mode-panel');
     var numberFallback = document.getElementById('number-mode-panel');
     var errEl    = document.getElementById('checkin-error');
+    var errCardEl = document.getElementById('checkin-error-card');
     var succEl   = document.getElementById('checkin-success');
     var formBody = document.getElementById('checkin-form-body');
     var againBtn = document.getElementById('checkin-again');
@@ -6679,8 +7314,11 @@
     if (qrBtn) { qrBtn.disabled = false; qrBtn.innerHTML = '<i class="ti ti-camera"></i> Open QR Scanner'; }
     switchCheckInMode('qr', true);
     if (errEl) { errEl.classList.remove('visible'); errEl.textContent = ''; }
+    if (errCardEl) errCardEl.classList.remove('visible');
     if (succEl) succEl.classList.remove('visible');
-    if (succTitle) succTitle.textContent = 'You are checked in';
+    if (succTitle) succTitle.textContent = 'You\'re all set!';
+    var succSub = document.getElementById('checkin-success-sub');
+    if (succSub) succSub.textContent = 'Your attendance has been recorded. Enjoy the session!';
     if (formBody) formBody.style.display = '';
     if (againBtn) againBtn.style.display = 'none';
     if (submitBtn) {
@@ -6927,7 +7565,7 @@
     if (!memberNumber) {
       selectedPublicMember = null;
       clearPublicSelectedOnly();
-      updatePublicMethodStatus('Please enter your member number.', 'warning');
+      updatePublicMethodStatus('Please enter your member / contact no.', 'warning');
       return null;
     }
 
@@ -6942,7 +7580,7 @@
     if (!member) {
       selectedPublicMember = null;
       clearPublicSelectedOnly();
-      updatePublicMethodStatus('No matching member number found. Please check the number or use Search by Name.', 'error');
+      updatePublicMethodStatus('No matching member / contact no. found. Please check the number or use Search by Name.', 'error');
       return null;
     }
 
@@ -6974,6 +7612,7 @@
 
   async function publicQrCheckInWithNumber(memberNumber) {
     var errEl = document.getElementById('checkin-error');
+    var errCardEl = document.getElementById('checkin-error-card');
     var succEl = document.getElementById('checkin-success');
     var succTitle = document.getElementById('checkin-success-title');
     var formBody = document.getElementById('checkin-form-body');
@@ -6982,11 +7621,14 @@
 
     if (_ciSubmitting) return;
     if (errEl) { errEl.classList.remove('visible'); errEl.textContent = ''; }
+    if (errCardEl) errCardEl.classList.remove('visible');
     if (succEl) succEl.classList.remove('visible');
 
-    var cleanNumber = extractMemberNumberFromQr(memberNumber);
-    if (!cleanNumber) {
-      updateQrStatus('QR was scanned but no valid member number was found.', 'error');
+    /* No client-side extraction here anymore — the RPC already does its own
+       number-cleaning, plus a name-matching fallback, on the raw value. */
+    var rawValue = String(memberNumber || '').trim();
+    if (!rawValue) {
+      updateQrStatus('QR was scanned but no valid data was found.', 'error');
       return;
     }
 
@@ -7001,25 +7643,36 @@
     updateQrStatus('Checking in…', 'warning');
 
     try {
-      var res = await client.rpc('public_qr_check_in', { p_member_number: cleanNumber });
+      var res = await client.rpc('public_qr_check_in', { p_member_number: rawValue });
       if (res.error) throw new Error(res.error.message || 'Check-in failed.');
       var data = res.data || {};
       if (data.ok !== true) {
-        throw new Error(data.message || 'Check-in failed. Please ask a leader.');
+        var failErr = new Error(data.message || 'Check-in failed. Please ask a leader.');
+        failErr.code = data.code || '';
+        throw failErr;
       }
 
       stopQrScanner(false);
-      if (succTitle) succTitle.textContent = data.code === 'already_checked_in' ? 'Already checked in' : 'You are checked in';
+      if (succTitle) succTitle.textContent = data.code === 'already_checked_in' ? 'Already checked in!' : 'You\'re all set!';
+      var succSub = document.getElementById('checkin-success-sub');
+      if (succSub) succSub.textContent = data.code === 'already_checked_in' ? 'You\'ve already been checked in for this session.' : 'Your attendance has been recorded. Enjoy the session!';
       if (formBody) formBody.style.display = 'none';
       if (succEl) succEl.classList.add('visible');
       if (againBtn) againBtn.style.display = 'block';
       console.log('[Public QR Check-In] Success:', data.code || 'checked_in');
     } catch(err) {
       console.warn('[Public QR Check-In] Failed:', err.message);
-      updateQrStatus(err.message || 'Check-in failed. Please try again or ask a leader.', 'error');
-      if (errEl) {
-        errEl.textContent = err.message || 'Check-in failed. Please try again or ask a leader.';
-        errEl.classList.add('visible');
+      if (err.code === 'member_not_found') {
+        stopQrScanner(false);
+        if (formBody) formBody.style.display = 'none';
+        if (errCardEl) errCardEl.classList.add('visible');
+        if (againBtn) againBtn.style.display = 'block';
+      } else {
+        updateQrStatus(err.message || 'Check-in failed. Please try again or ask a leader.', 'error');
+        if (errEl) {
+          errEl.textContent = err.message || 'Check-in failed. Please try again or ask a leader.';
+          errEl.classList.add('visible');
+        }
       }
       if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-camera"></i> Open QR Scanner'; }
       _ciSubmitting = false;
@@ -7052,13 +7705,17 @@
         { facingMode: 'environment' },
         config,
         function(decodedText) {
-          var memberNumber = extractMemberNumberFromQr(decodedText);
-          if (!memberNumber) {
-            updateQrStatus('QR was scanned but no member number was found.', 'error');
+          /* Pass the raw scanned text straight through — the RPC already does
+             its own number-cleaning internally, and now also falls back to
+             name matching. Pre-extracting here would truncate full names
+             (e.g. "Juan Dela Cruz" → "Juan") before they ever reach it. */
+          var rawValue = String(decodedText || '').trim();
+          if (!rawValue) {
+            updateQrStatus('QR was scanned but no usable data was found.', 'error');
             return;
           }
           stopQrScanner(false);
-          publicQrCheckInWithNumber(memberNumber);
+          publicQrCheckInWithNumber(rawValue);
         },
         function() {}
       );
@@ -7489,7 +8146,7 @@
       if ((!selectedPublicMember || !selectedPublicMember.id) && nameEl && publicSearchInputIsLongEnough(nameEl.value)) runPublicNameSearch(nameEl.value.trim());
       if (!selectedPublicMember || !selectedPublicMember.id) {
         if (errEl) {
-          errEl.textContent = 'Scan your QR, enter your member number, or select your name before confirming.';
+          errEl.textContent = 'Scan your QR, enter your member / contact no., or select your name before confirming.';
           errEl.classList.add('visible');
         }
         return;
@@ -7527,7 +8184,9 @@
         console.log('[Public Check-In] Already checked in for today:', selectedPublicMember.name, sessionDate);
       }
 
-      if (succTitle) succTitle.textContent = 'You are checked in';
+      if (succTitle) succTitle.textContent = 'You\'re all set!';
+      var succSub = document.getElementById('checkin-success-sub');
+      if (succSub) succSub.textContent = 'Your attendance has been recorded. Enjoy the session!';
 
       if (state.records && selectedPublicMember.name) {
         if (!state.records[sessionDate]) state.records[sessionDate] = {};
@@ -7784,7 +8443,10 @@
         '</div>' +
         '<div class="status-field">' +
           '<label for="checkin-status-search">Search name or group</label>' +
-          '<input type="search" id="checkin-status-search" placeholder="Search member name or group…" value="' + esc(checkinStatusSearch || '') + '" oninput="handleCheckinStatusSearchInput(this.value)" />' +
+          '<div style="position:relative">' +
+            '<i class="ti ti-search" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--text-3);pointer-events:none"></i>' +
+            '<input type="search" id="checkin-status-search" placeholder="Search member name or group…" value="' + esc(checkinStatusSearch || '') + '" oninput="handleCheckinStatusSearchInput(this.value)" style="padding-left:34px" />' +
+          '</div>' +
           '<div class="status-date-note">Filters both Present and Absent lists.</div>' +
         '</div>' +
       '</div>' +
@@ -7794,6 +8456,635 @@
 
     renderCheckinStatusLists();
   }
+
+  /* ═══════════════════════════════════════════════════════════════
+     Non-COP Member Self-Registration
+     ─────────────────────────────────────────────────────────────
+     Phone/contact number is used as the unique member_number.
+     After registration the member is added to the Supabase
+     members table and a personal QR code is displayed for them
+     to save. The existing QR scanner reads it just like a normal
+     COP member number.
+  ═══════════════════════════════════════════════════════════════ */
+
+  var _registerSubmitting = false;
+
+  var _qrWasRunning = false;
+
+  function showRegister() {
+    _qrWasRunning = qrScannerRunning; /* remember if scanner was open */
+    stopQrScanner(false);
+    document.getElementById('overlay-welcome').classList.add('hidden');
+    document.getElementById('overlay-signin').classList.add('hidden');
+    document.getElementById('overlay-register').classList.remove('hidden');
+    resetRegisterForm();
+    setTimeout(function() {
+      var n = document.getElementById('register-name');
+      if (n) n.focus();
+    }, 80);
+  }
+
+  function resetRegisterForm() {
+    var errEl    = document.getElementById('register-error');
+    var formBody = document.getElementById('register-form-body');
+    var success  = document.getElementById('register-success-box');
+    var nameEl   = document.getElementById('register-name');
+    var phoneEl  = document.getElementById('register-phone');
+    var btn      = document.getElementById('register-submit-btn');
+    var cardHeader = document.getElementById('register-card-header');
+    if (cardHeader) cardHeader.style.display = '';
+    if (errEl)    { errEl.classList.remove('visible'); errEl.textContent = ''; }
+    if (formBody) formBody.style.display = '';
+    if (success)  success.classList.remove('visible');
+    if (nameEl)   nameEl.value = '';
+    if (phoneEl)  phoneEl.value = '';
+    if (btn)      btn.disabled = true;
+    _registerSubmitting = false;
+  }
+
+  function updateRegisterButton() {
+    var nameEl  = document.getElementById('register-name');
+    var phoneEl = document.getElementById('register-phone');
+    var btn     = document.getElementById('register-submit-btn');
+    if (!btn) return;
+    var name  = (nameEl  ? nameEl.value  : '').trim();
+    var phone = cleanMemberNumber(phoneEl ? phoneEl.value : '');
+    btn.disabled = (!name || phone.length < 7);
+  }
+
+  async function submitNonCopRegistration() {
+    if (_registerSubmitting) return;
+
+    var nameEl   = document.getElementById('register-name');
+    var phoneEl  = document.getElementById('register-phone');
+    var errEl    = document.getElementById('register-error');
+    var btn      = document.getElementById('register-submit-btn');
+    var formBody = document.getElementById('register-form-body');
+    var success  = document.getElementById('register-success-box');
+    var qrImg    = document.getElementById('register-qr-img');
+    var qrName   = document.getElementById('register-qr-name');
+
+    if (errEl) { errEl.classList.remove('visible'); errEl.textContent = ''; }
+
+    var name  = (nameEl  ? nameEl.value  : '').trim();
+    var phone = cleanMemberNumber(phoneEl ? phoneEl.value : '');
+
+    /* ── Validation ── */
+    if (!name) {
+      if (errEl) { errEl.textContent = 'Please enter your full name.'; errEl.classList.add('visible'); }
+      if (nameEl) nameEl.focus();
+      return;
+    }
+    if (name.length > 80) {
+      if (errEl) { errEl.textContent = 'Name is too long. Please use 80 characters or fewer.'; errEl.classList.add('visible'); }
+      if (nameEl) nameEl.focus();
+      return;
+    }
+    if (!phone || phone.length < 7) {
+      if (errEl) { errEl.textContent = 'Please enter a valid contact number (at least 7 digits).'; errEl.classList.add('visible'); }
+      if (phoneEl) phoneEl.focus();
+      return;
+    }
+
+    var client = getSupabaseClient();
+    if (!client) {
+      if (errEl) { errEl.textContent = 'Connection error. Please try again or ask a leader.'; errEl.classList.add('visible'); }
+      return;
+    }
+
+    _registerSubmitting = true;
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader"></i> Registering…'; }
+
+    try {
+      /* ── Single secure RPC call — no direct table access needed ── */
+      var res = await client.rpc('public_register_participant', {
+        p_name: name,
+        p_member_number: phone
+      });
+
+      if (res.error) throw new Error(res.error.message || 'Registration failed.');
+      var data = res.data || {};
+
+      if (data.ok !== true) {
+        if (data.code === 'already_registered') {
+          /* ── Already registered — show their QR code so they can retrieve it ── */
+          var qrData = encodeURIComponent(name);
+          var qrUrl  = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&ecc=M&data=' + qrData;
+          if (qrImg) { qrImg.src = qrUrl; qrImg.alt = 'QR code'; }
+
+          var successTitle = document.getElementById('register-success-title');
+          if (successTitle) successTitle.innerHTML = '<i class="ti ti-circle-check"></i> Already registered!';
+
+          var cardHeader = document.getElementById('register-card-header');
+          if (cardHeader) cardHeader.style.display = 'none';
+          if (formBody) formBody.style.display = 'none';
+          if (success) success.classList.add('visible');
+          _registerSubmitting = false;
+          if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-user-check"></i> Register &amp; Get My QR Code'; }
+          console.log('[Registration] Already registered — showing QR for:', data.name);
+          return;
+        }
+        /* Other validation errors */
+        if (errEl) {
+          errEl.textContent = data.message || 'Registration failed.';
+          errEl.classList.add('visible');
+        }
+        _registerSubmitting = false;
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="ti ti-user-check"></i> Register &amp; Get My QR Code';
+        }
+        return;
+      }
+
+      /* Reset the title back for fresh registrations */
+      var successTitle = document.getElementById('register-success-title');
+      if (successTitle) successTitle.innerHTML = '<i class="ti ti-circle-check"></i> Successfully Registered!';
+
+      /* ── Success — use returned data ── */
+      var newId = data.id;
+
+      /* Update local state so the new member is searchable immediately */
+      if (state && Array.isArray(state.members)) {
+        state.members.push({
+          id: newId,
+          name: name,
+          memberNumber: phone,
+          member_number: phone,
+          group: 'Unassigned',
+          group_id: null
+        });
+        try { saveState(); } catch(e) { /* non-fatal */ }
+      }
+
+      /* Update the public roster cache so QR check-in works right away */
+      if (publicRosterLoaded && Array.isArray(publicRoster)) {
+        publicRoster.push({
+          id: newId,
+          name: name,
+          memberNumber: phone,
+          group: 'Unassigned',
+          groupId: null
+        });
+      }
+
+      /* Generate personal QR code via free QR API — encodes the participant's
+         full name. The check-in RPC (public_qr_check_in) tries number-based
+         matching first for COP members, then falls back to name-based
+         matching for non-COP participants registered through this flow.    */
+      var qrData = encodeURIComponent(name);
+      var qrUrl  = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&ecc=M&data=' + qrData;
+      if (qrImg) { qrImg.src = qrUrl; qrImg.alt = 'QR code'; }
+
+      /* Switch to success view */
+      var cardHeader = document.getElementById('register-card-header');
+      if (cardHeader) cardHeader.style.display = 'none';
+      if (formBody) formBody.style.display = 'none';
+      if (success) success.classList.add('visible');
+
+      console.log('[Registration] Non-COP participant registered via RPC:', name, '| member_number:', phone);
+      _registerSubmitting = false;
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-user-check"></i> Register &amp; Get My QR Code'; }
+
+    } catch (err) {
+      console.warn('[Registration] Failed:', err.message);
+      if (errEl) {
+        errEl.textContent = 'Registration failed. Please try again or ask a leader for help.';
+        errEl.classList.add('visible');
+      }
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ti ti-user-check"></i> Register &amp; Get My QR Code';
+      }
+      _registerSubmitting = false;
+    }
+  }
+
+  /* ── Roster search filter ── */
+  function filterRoster(query) {
+    var q = (query || '').toLowerCase().trim();
+    var sections = document.querySelectorAll('#member-list .group-section');
+    sections.forEach(function(section) {
+      var cards = section.querySelectorAll('.member-card');
+      var anyVisible = false;
+      cards.forEach(function(card) {
+        var text = card.textContent.toLowerCase();
+        var show = !q || text.indexOf(q) !== -1;
+        card.style.display = show ? '' : 'none';
+        if (show) anyVisible = true;
+      });
+      /* hide whole group section if no members match */
+      section.style.display = anyVisible ? '' : 'none';
+    });
+  }
+
+  window.filterRoster = filterRoster;
+
+  /* ═══════════════════════════════════════════════════════
+     AI ASSISTANT — Gemini 1.5 Flash (free tier)
+     ═══════════════════════════════════════════════════════ */
+
+  /* Load Gemini API key from Supabase app_settings */
+  async function loadGeminiKey() {
+    var key = await supabaseSettingsLoad('gemini_api_key');
+    if (key) geminiApiKey = key;
+  }
+
+  /* Save Gemini API key to Supabase */
+  async function saveGeminiKey() {
+    var inp = document.getElementById('settings-gemini-key');
+    var statusEl = document.getElementById('gemini-key-status');
+    if (!inp) return;
+    var key = inp.value.trim();
+    geminiApiKey = key;
+    await supabaseSettingsSave('gemini_api_key', key);
+    if (statusEl) {
+      statusEl.textContent = key ? '✓ Saved' : 'Key cleared.';
+      statusEl.style.color = key ? '#1D9E75' : 'var(--text-2)';
+      setTimeout(function() { if (statusEl) statusEl.textContent = ''; }, 3000);
+    }
+  }
+
+  /* Toggle visibility of Gemini key input */
+  function toggleGeminiKeyVisibility() {
+    var inp  = document.getElementById('settings-gemini-key');
+    var icon = document.getElementById('gemini-eye-icon');
+    if (!inp) return;
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      if (icon) icon.className = 'ti ti-eye-off';
+    } else {
+      inp.type = 'password';
+      if (icon) icon.className = 'ti ti-eye';
+    }
+  }
+
+  /* Show / hide floating AI button */
+  function showAIFab() {
+    var fab = document.getElementById('ai-chat-fab');
+    if (fab) fab.classList.remove('hidden');
+  }
+  function hideAIFab() {
+    var fab   = document.getElementById('ai-chat-fab');
+    var panel = document.getElementById('ai-chat-panel');
+    if (fab)   fab.classList.add('hidden');
+    if (panel) { panel.classList.remove('ai-panel-open'); panel.classList.add('hidden'); }
+    aiChatOpen = false;
+  }
+
+  /* Toggle chat panel open / closed */
+  function toggleAIChat() {
+    aiChatOpen = !aiChatOpen;
+    var panel = document.getElementById('ai-chat-panel');
+    var fab   = document.getElementById('ai-chat-fab');
+    if (aiChatOpen) {
+      panel.classList.remove('hidden');
+      /* slight delay so display:block is rendered before transition fires */
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          panel.classList.add('ai-panel-open');
+        });
+      });
+      fab.classList.add('ai-fab-active');
+      if (document.getElementById('ai-messages').querySelectorAll('.ai-msg').length === 1) {
+        renderAIStarters(); /* show starters on first open */
+      }
+      setTimeout(function() {
+        var inp = document.getElementById('ai-input');
+        if (inp) inp.focus();
+      }, 120);
+    } else {
+      panel.classList.remove('ai-panel-open');
+      fab.classList.remove('ai-fab-active');
+      setTimeout(function() { panel.classList.add('hidden'); }, 280);
+    }
+  }
+
+  /* Render suggested starter questions */
+  function renderAIStarters() {
+    var starters = document.getElementById('ai-starters');
+    if (!starters) return;
+    var questions = [
+      "Who hasn't attended in the last 3 sessions?",
+      "Which group has the best attendance?",
+      "How do I import members via CSV?",
+      "How do I archive and start a new event?"
+    ];
+    starters.innerHTML = questions.map(function(q) {
+      return '<button class="ai-starter-btn" onclick="askFromStarter(this)">' + esc(q) + '</button>';
+    }).join('');
+    starters.style.display = 'flex';
+  }
+
+  /* Click a starter question */
+  function askFromStarter(btn) {
+    var question = btn.textContent || btn.innerText;
+    var starters = document.getElementById('ai-starters');
+    if (starters) starters.style.display = 'none';
+    var inp = document.getElementById('ai-input');
+    if (inp) inp.value = question;
+    sendAIMessage();
+  }
+
+  /* Build the system prompt — app guide + live data */
+  function buildAISystemPrompt() {
+    var sessions     = validAttendanceWeeks();
+    var totalSess    = sessions.length;
+    var memberCount  = state.members.length;
+    var groupList    = state.groups.filter(function(g) { return g !== 'Unassigned'; });
+
+    /* ── Static app guide ── */
+    var guide = [
+      'You are an AI assistant built into "' + trackerName + '", a web-based bootcamp attendance tracking app.',
+      '',
+      'YOUR ROLE:',
+      '- Answer questions about HOW TO USE the app (features, step-by-step, troubleshooting errors).',
+      '- Answer questions about the ATTENDANCE DATA (who attended, who is absent, group stats, trends).',
+      '- Be concise and direct. Use bullet points where helpful.',
+      '- Never make up attendance data. Only use the live data provided below.',
+      '- If no attendance data exists yet, say so and guide the admin on how to get started.',
+      '- ALWAYS use the "TODAY\'S DATE" value given in the live data below for any question involving "today", "now", "this week", "yesterday", etc. Never guess or assume a date from memory.',
+      '- Sessions tagged [THIS IS TODAY] in the SESSION SUMMARY are today\'s session. If today\'s date has a session listed, attendance HAS been recorded for today — do not say otherwise.',
+      '- All dates in the live data below are in YYYY-MM-DD format for exact matching. When speaking to the admin, ALWAYS phrase dates in natural words instead, e.g. write "June 19, 2026" not "2026-06-19".',
+      '',
+      'APP PAGES AND FEATURES:',
+      '• Members — View, add, edit, delete members. Each member needs a Full Name and a Member/Contact No. (this generates their personal QR code for check-in). Group is optional. Features: inline add form, Bulk Add, Import CSV, Export CSV.',
+      '• Groups — Create, rename, delete groups. Move members between groups.',
+      '• Manage Attendance — Admin picks a date, checks/unchecks each member as present or absent, then saves. Only saved dates count as valid sessions.',
+      '• History — Browse past attendance sessions by date. Tap/click a date to expand and see exactly who was present or absent.',
+      '• Check-In Status — Real-time view of who is present or absent on a selected date. Has a search bar to find a specific member.',
+      '• Settings — Configure: Event Name, Event Start Date, Event End Date (optional), Logo/Branding, Appearance (dark/light mode), Archive & Reset, and this AI Assistant API key.',
+      '',
+      'PUBLIC CHECK-IN PAGE (separate from admin, no login needed):',
+      '• Members scan their personal QR code → auto check-in recorded in Supabase instantly.',
+      '• Non-COP / guest members fill a registration form → receive their QR code → scan it to check in.',
+      '• There is NO member name list on the public page — it is QR-scan only.',
+      '',
+      'CSV IMPORT (Members page → Import CSV):',
+      '• Required columns: Full Name, Member / Contact No.',
+      '• Optional column: Group',
+      '• Status flags shown during preview:',
+      '  - Ready → will be imported',
+      '  - Missing name → row has no name, must edit or delete',
+      '  - Missing number → row has no member number, must edit or delete',
+      '  - Duplicate name → same name already in roster',
+      '  - Duplicate number → same contact/member number already used',
+      '  - Already in roster → member already exists in the system',
+      '• Only one row can be edited at a time. Opening a second edit cancels the previous one without saving.',
+      '',
+      'CSV EXPORT:',
+      '• Members page → Export CSV → reimport-ready file with all members.',
+      '• Settings → Export Archive → full event backup with attendance history by date.',
+      '',
+      'ATTENDANCE CALCULATION:',
+      '• Only dates with saved attendance records count as sessions. Calendar days without any record are completely ignored.',
+      '• Attendance % = (sessions attended ÷ total sessions recorded) × 100.',
+      '',
+      'COMMON OPERATIONS:',
+      '• Add a single member: Members page → fill the add form at the top → click Add.',
+      '• Bulk add members: Members page → Bulk Add → paste a list of names.',
+      '• Import many members: Members page → Import CSV → upload CSV file → preview → confirm.',
+      '• Edit a member: Members page → click the pencil (✏) icon on their row.',
+      '• Delete a member: Members page → click the trash (🗑) icon → confirm.',
+      '• Mark attendance manually: Manage Attendance → select a date → check/uncheck members → Save Attendance.',
+      '• View who attended a session: History → expand the date row.',
+      '• Archive the event: Settings → Step 1 click Export Archive → Step 2 type RESET → Step 3 click Start New Event.',
+      '• Change the app logo: Settings → Branding section → upload or select a saved logo.',
+      '• Enable AI assistant: Settings → AI Assistant section → paste Gemini API key → Save Key.',
+      '',
+      'COMMON ERRORS AND WHAT THEY MEAN:',
+      '• "Member / Contact No. is required for QR check-in" — member number field is blank. Every member needs a unique number.',
+      '• "Duplicate number" during CSV import — two members share the same contact/member number.',
+      '• "Already in roster" during CSV import — the member name already exists in the system.',
+      '• "QR not scanning" — check camera permissions in the browser. Make sure the member is using their own personal QR card.',
+      '• Attendance percentage looks wrong — make sure you are only saving attendance on actual session days. The system counts every saved date as a session.',
+    ].join('\n');
+
+    /* ── Live data ── */
+    var todayDate = todayISO();
+    var lines = [];
+    lines.push('TODAY\'S DATE: ' + todayDate + ' (' + isoToWords(todayDate) + ') — Philippine time. Use this as ground truth, do not guess.');
+    lines.push('EVENT: ' + trackerName);
+    lines.push('START DATE: ' + (trackerStartDate || 'Not set'));
+    lines.push('END DATE: ' + (eventEndDate || 'Not set'));
+    lines.push('TOTAL MEMBERS: ' + memberCount);
+    lines.push('GROUPS: ' + (groupList.length ? groupList.join(', ') : 'None'));
+    lines.push('TOTAL SESSIONS RECORDED: ' + totalSess);
+
+    if (totalSess > 0) {
+      lines.push('SESSION DATES: ' + sessions.join(', '));
+      lines.push('');
+
+      /* Per-session summary */
+      lines.push('SESSION SUMMARY (date | present | absent | %):');
+      sessions.forEach(function(d) {
+        var rec     = state.records[d] || {};
+        var present = 0, absent = 0;
+        Object.keys(rec).forEach(function(n) { if (rec[n] === true) present++; else absent++; });
+        var total   = present + absent;
+        var pct     = total ? Math.round((present / total) * 100) : 0;
+        var tag     = (d === todayDate) ? ' [THIS IS TODAY]' : '';
+        lines.push(d + ' | ' + present + ' present | ' + absent + ' absent | ' + pct + '%' + tag);
+      });
+      lines.push('');
+
+      /* Group summary */
+      if (groupList.length) {
+        lines.push('GROUP AVERAGE ATTENDANCE:');
+        groupList.forEach(function(g) {
+          var gm = state.members.filter(function(m) { return m.group === g; });
+          if (!gm.length) return;
+          var total = 0, attended = 0;
+          gm.forEach(function(m) {
+            sessions.forEach(function(d) {
+              total++;
+              if ((state.records[d] || {})[m.name] === true) attended++;
+            });
+          });
+          var pct = total ? Math.round((attended / total) * 100) : 0;
+          lines.push(g + ': ' + gm.length + ' members, ' + pct + '% avg');
+        });
+        lines.push('');
+      }
+
+      /* Per-member breakdown */
+      lines.push('MEMBER ATTENDANCE (name | group | attended/total | % | last-3: P=Present A=Absent | note):');
+      state.members.forEach(function(m) {
+        var attended = 0;
+        sessions.forEach(function(d) {
+          if ((state.records[d] || {})[m.name] === true) attended++;
+        });
+        var pct   = Math.round((attended / totalSess) * 100);
+        var last3 = sessions.slice(-3).map(function(d) {
+          return (state.records[d] || {})[m.name] === true ? 'P' : 'A';
+        }).join('');
+        /* consecutive misses from most recent session */
+        var misses = 0;
+        for (var i = sessions.length - 1; i >= 0; i--) {
+          if ((state.records[sessions[i]] || {})[m.name] === false) misses++;
+          else break;
+        }
+        var note = misses >= 3 ? ' [AT RISK: ' + misses + ' consecutive misses]'
+                 : misses >= 2 ? ' [' + misses + ' consecutive misses]' : '';
+        lines.push(m.name + ' | ' + m.group + ' | ' + attended + '/' + totalSess + ' | ' + pct + '% | last3:' + last3 + note);
+      });
+    } else if (memberCount > 0) {
+      lines.push('No attendance sessions recorded yet.');
+      lines.push('MEMBERS IN ROSTER:');
+      state.members.slice(0, 50).forEach(function(m) {
+        lines.push('- ' + m.name + ' (' + m.group + ')');
+      });
+      if (memberCount > 50) lines.push('... and ' + (memberCount - 50) + ' more');
+    } else {
+      lines.push('No members or attendance data recorded yet.');
+    }
+
+    return guide + '\n\nLIVE DATA:\n' + lines.join('\n');
+  }
+
+  /* Call Gemini 1.5 Flash API */
+  async function askGemini(userMessage) {
+    if (!geminiApiKey) {
+      return 'No Gemini API key found. Please go to Settings → AI Assistant and paste your free key from aistudio.google.com.';
+    }
+
+    /* Add user message to history */
+    aiChatHistory.push({ role: 'user', parts: [{ text: userMessage }] });
+
+    var systemPrompt = buildAISystemPrompt();
+    /* Keep last 10 turns to stay within free tier context limits */
+    var recentHistory = aiChatHistory.slice(-10);
+
+    try {
+      var resp = await fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + geminiApiKey,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: systemPrompt }] },
+            contents: recentHistory,
+            generationConfig: { maxOutputTokens: 600, temperature: 0.2 }
+          })
+        }
+      );
+
+      if (!resp.ok) {
+        var errData = null;
+        try { errData = await resp.json(); } catch(e) {}
+        var msg = errData && errData.error && errData.error.message ? errData.error.message : '';
+        if (resp.status === 400 || msg.toLowerCase().indexOf('api key') !== -1 || msg.toLowerCase().indexOf('invalid') !== -1) {
+          aiChatHistory.pop();
+          return 'Invalid API key. Please check your key in Settings → AI Assistant.';
+        }
+        if (resp.status === 429) {
+          aiChatHistory.pop();
+          return 'Too many requests. Wait a moment and try again (Gemini free tier limit).';
+        }
+        aiChatHistory.pop();
+        return 'Error from AI (' + resp.status + '). Please try again.';
+      }
+
+      var data = await resp.json();
+      var text = data.candidates &&
+                 data.candidates[0] &&
+                 data.candidates[0].content &&
+                 data.candidates[0].content.parts &&
+                 data.candidates[0].content.parts[0] &&
+                 data.candidates[0].content.parts[0].text
+                 ? data.candidates[0].content.parts[0].text
+                 : 'No response received. Please try again.';
+
+      /* Add model reply to history */
+      aiChatHistory.push({ role: 'model', parts: [{ text: text }] });
+      return text;
+
+    } catch (err) {
+      aiChatHistory.pop();
+      return 'Could not reach AI. Check your internet connection and try again.';
+    }
+  }
+
+  /* Send a message from the chat input */
+  /* Cooldown after each message so the free Gemini tier's rate limit (15 req/min)
+     is never hit from rapid sends. Shows a visible countdown in the input itself. */
+  var AI_COOLDOWN_SECONDS = 5; /* 60/5 = 12 req/min — stays under Gemini's 15 RPM free-tier cap with real margin */
+  function startAICooldown() {
+    var inp = document.getElementById('ai-input');
+    var btn = document.getElementById('ai-send-btn');
+    if (!inp) return;
+    if (aiCooldownTimerId) { clearInterval(aiCooldownTimerId); aiCooldownTimerId = null; }
+    var remaining = AI_COOLDOWN_SECONDS;
+    inp.disabled = true;
+    if (btn) btn.disabled = true;
+    inp.placeholder = 'You can ask again in ' + remaining + 's…';
+    aiCooldownTimerId = setInterval(function() {
+      remaining--;
+      if (remaining <= 0) {
+        clearInterval(aiCooldownTimerId);
+        aiCooldownTimerId = null;
+        inp.disabled = false;
+        if (btn) btn.disabled = false;
+        inp.placeholder = 'Ask me anything…';
+        inp.focus();
+      } else {
+        inp.placeholder = 'You can ask again in ' + remaining + 's…';
+      }
+    }, 1000);
+  }
+
+  /* Send a message from the chat input */
+  async function sendAIMessage() {
+    var inp = document.getElementById('ai-input');
+    if (!inp) return;
+    var message = inp.value.trim();
+    if (!message) return;
+
+    /* Hide starter suggestions the moment any message is sent — whether typed
+       directly or chosen from a starter button — so they don't linger below. */
+    var starters = document.getElementById('ai-starters');
+    if (starters) starters.style.display = 'none';
+
+    inp.value = '';
+    inp.disabled = true;
+    var btn = document.getElementById('ai-send-btn');
+    if (btn) btn.disabled = true;
+
+    var messagesEl = document.getElementById('ai-messages');
+
+    /* User bubble */
+    var userDiv = document.createElement('div');
+    userDiv.className = 'ai-msg ai-msg-user';
+    userDiv.textContent = message;
+    messagesEl.appendChild(userDiv);
+
+    /* Loading dots */
+    var loadingDiv = document.createElement('div');
+    loadingDiv.className = 'ai-msg ai-msg-bot ai-msg-loading';
+    loadingDiv.innerHTML = '<span></span><span></span><span></span>';
+    messagesEl.appendChild(loadingDiv);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    var response = await askGemini(message);
+
+    /* Remove loading, add bot reply */
+    if (loadingDiv.parentNode) messagesEl.removeChild(loadingDiv);
+    var botDiv = document.createElement('div');
+    botDiv.className = 'ai-msg ai-msg-bot';
+    botDiv.textContent = response;
+    messagesEl.appendChild(botDiv);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    /* Cooldown instead of immediately re-enabling — keeps requests spaced out
+       safely under the free tier's rate limit. */
+    startAICooldown();
+  }
+
+  window.renderCsvPreviewTable = renderCsvPreviewTable;
+  window.deleteCsvRow          = deleteCsvRow;
+  window.editCsvRow            = editCsvRow;
+  window.saveCsvRowEdit        = saveCsvRowEdit;
+  window.cancelCsvRowEdit      = cancelCsvRowEdit;
 
   window.switchPage          = switchPage;
   window.addMember           = addMember;
@@ -7842,10 +9133,19 @@
   window.toggleEl            = toggleEl;
   window.hideEl              = hideEl;
   /* Auth */
-  window.showWelcome         = showWelcome;
+  window.showWelcome              = showWelcome;
+  window.showRegister             = showRegister;
+  window.resetRegisterForm        = resetRegisterForm;
+  window.updateRegisterButton     = updateRegisterButton;
+  window.submitNonCopRegistration = submitNonCopRegistration;
   window.showSignIn          = showSignIn;
   window.handleSignIn        = handleSignIn;
   window.handleLogout        = handleLogout;
+  window.saveGeminiKey         = saveGeminiKey;
+  window.toggleGeminiKeyVisibility = toggleGeminiKeyVisibility;
+  window.toggleAIChat          = toggleAIChat;
+  window.sendAIMessage         = sendAIMessage;
+  window.askFromStarter        = askFromStarter;
   window.togglePwVisibility  = togglePwVisibility;
   window.submitCheckIn       = submitCheckIn;
   window.confirmPublicCheckIn = confirmPublicCheckIn;
@@ -7860,6 +9160,35 @@
 
 </script>
 <!-- Supabase JS SDK — loaded last so it never blocks app functions -->
+<script>
+  /* ── Session pre-check (runs synchronously before Supabase loads) ──
+     If a Supabase session token exists in localStorage, the user is
+     likely a logged-in admin. Show the dashboard loader immediately so
+     the public check-in page never flashes on hard refresh.          */
+  (function() {
+    try {
+      var token = localStorage.getItem('sb-mlxfijwuqcvjdanfsblk-auth-token');
+      if (token) {
+        var parsed = JSON.parse(token);
+        if (parsed && (parsed.access_token || (parsed.session && parsed.session.access_token))) {
+          /* Hide public overlays immediately */
+          var welcome = document.getElementById('overlay-welcome');
+          var register = document.getElementById('overlay-register');
+          if (welcome)  welcome.classList.add('hidden');
+          if (register) register.classList.add('hidden');
+          /* Show the same dashboard loader the admin sees on normal login */
+          var overlay = document.getElementById('dashboard-loading-overlay');
+          var title   = document.getElementById('dashboard-loading-title');
+          var sub     = document.getElementById('dashboard-loading-sub');
+          if (overlay) overlay.classList.remove('hidden');
+          if (title)   title.textContent = 'Loading dashboard…';
+          if (sub)     sub.textContent   = 'Please wait while we prepare the latest members, groups, and attendance records.';
+          document.body.classList.add('dashboard-loading-active');
+        }
+      }
+    } catch(e) { /* non-fatal — fall through to normal flow */ }
+  })();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onload="checkAuthSession()"></script>
 </body>
 </html>

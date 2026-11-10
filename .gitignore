@@ -1,0 +1,31 @@
+# macOS junk
+.DS_Store
+._*
+
+# Secrets - never commit these
+.env
+.env.*
+*.pem
+*.key
+secrets.*
+
+# Database dumps and local database files (may contain real member data)
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.bak
+backup*.sql
+members*.csv
+attendance*.csv
+
+# Logs
+*.log
+
+# Editor folders
+.vscode/
+.idea/
+
+# Dependencies and build output (if you add a build step later)
+node_modules/
+dist/
